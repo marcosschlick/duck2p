@@ -11,24 +11,41 @@ A Inteligência Artificial desempenha o papel de pareamento semântico via simil
 ## Como Rodar o Projeto
 
 ### Pré-requisitos
-* Docker e Docker Compose
-* Python e pip
-* Node.js e npm
+* Docker e Docker Compose (ou Podman e podman-compose)
+* Python e pip (opcional, para execução local direta)
+* Node.js e npm (opcional, para execução local direta)
 
 ---
 
-### 1. Banco de Dados (PostgreSQL)
+### 1. Com Docker Compose (Recomendado)
 
 Na raiz do projeto:
 
 ```bash
 cp .env.example .env
-docker compose up -d
+docker compose up --build
 ```
+
+Os serviços iniciam automaticamente com suporte a hot-reload:
+* Aplicação Frontend: `http://localhost:5173`
+* API Backend: `http://localhost:8000`
+* Documentação da API: `http://localhost:8000/docs`
+* PostgreSQL: `localhost:5432`
 
 ---
 
-### 2. Backend (FastAPI)
+### 2. Execução Local Direta (Alternativa)
+
+#### Banco de Dados (PostgreSQL)
+
+Na raiz do projeto:
+
+```bash
+cp .env.example .env
+docker compose up -d db
+```
+
+#### Backend (FastAPI)
 
 Em um terminal:
 
@@ -40,12 +57,7 @@ pip install -r requirements.txt
 PYTHONPATH=src uvicorn main:app --reload --port 8000
 ```
 
-* API: `http://localhost:8000`
-* Documentação: `http://localhost:8000/docs`
-
----
-
-### 3. Frontend (React)
+#### Frontend (React)
 
 Em outro terminal:
 
@@ -55,19 +67,17 @@ npm install
 npm run dev
 ```
 
-* Aplicação: `http://localhost:5173`
-
 ---
 
 ### Comandos Úteis
 
-* Parar o banco de dados:
+* Parar os serviços:
   ```bash
   docker compose stop
   ```
-* Resetar o banco de dados:
+* Parar e remover containers e volumes:
   ```bash
   docker compose down -v
-  docker compose up -d
   ```
+
 
