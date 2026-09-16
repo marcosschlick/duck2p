@@ -4,7 +4,6 @@ from dataclasses import dataclass
 @dataclass
 class MentorProfile:
     user_id: int
-    contact: str
     skills: str
     embedding: str | None = None
     is_available: bool = True

@@ -3,14 +3,16 @@ from database import get_db_connection
 
 class QuestionRepository:
     @staticmethod
-    def create(student_id: int, problem_description: str) -> dict:
+    def create(
+        student_id: int, problem_description: str, embedding: str | None = None
+    ) -> dict:
         query = """
-            INSERT INTO questions (student_id, problem_description, status)
-            VALUES (%s, %s, 'pending')
+            INSERT INTO questions (student_id, problem_description, embedding, status)
+            VALUES (%s, %s, %s, 'pending')
             RETURNING id, student_id, problem_description, embedding, status, created_at;
         """
         with get_db_connection() as conn, conn.cursor() as cur:
-            cur.execute(query, (student_id, problem_description))
+            cur.execute(query, (student_id, problem_description, embedding))
             return cur.fetchone()
 
     @staticmethod

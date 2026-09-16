@@ -79,6 +79,16 @@ class AuthService:
         return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     def register(self, data: UserRegisterRequest) -> UserResponse:
+        allowed_courses = (
+            "Análise e Desenvolvimento de Sistemas",
+            "Técnico em Informática (Integrado)",
+        )
+        if data.course not in allowed_courses:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Curso inválido. Escolha entre os cursos autorizados do IFSUL.",
+            )
+
         self.validate_password_strength(data.password)
         if self.user_repo.find_by_email(data.email):
             raise HTTPException(

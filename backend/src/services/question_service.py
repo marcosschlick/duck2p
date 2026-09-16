@@ -1,3 +1,5 @@
+import json
+
 from dtos.question_dto import (
     QuestionCreateRequest,
     QuestionOpenItem,
@@ -6,6 +8,8 @@ from dtos.question_dto import (
 from fastapi import HTTPException, status
 from repositories.mentor_repository import MentorRepository
 from repositories.question_repository import QuestionRepository
+from services.ai_service import AIService
+from services.match_service import MatchService
 
 
 class QuestionService:
@@ -13,16 +17,43 @@ class QuestionService:
         self,
         question_repo: QuestionRepository | None = None,
         mentor_repo: MentorRepository | None = None,
+        match_service: MatchService | None = None,
+        ai_service: AIService | None = None,
     ):
         self.question_repo = question_repo or QuestionRepository()
         self.mentor_repo = mentor_repo or MentorRepository()
+        self.match_service = match_service or MatchService()
+        self.ai_service = ai_service or AIService()
 
     def create_question(
         self, student_id: int, data: QuestionCreateRequest
     ) -> QuestionResponse:
-        created = self.question_repo.create(
-            student_id=student_id, problem_description=data.problem_description
+        embedding_json = self.ai_service.generate_embedding_json(
+            data.problem_description
         )
+        created = self.question_repo.create(
+            student_id=student_id,
+            problem_description=data.problem_description,
+            embedding=embedding_json,
+        )
+
+        embedding_vec = json.loads(embedding_json)
+        available_mentors = self.mentor_repo.list_available_approved()
+        candidate_mentors = [m for m in available_mentors if m["user_id"] != student_id]
+
+        if candidate_mentors:
+            best_match = self.ai_service.find_best_mentor(
+                embedding_vec, candidate_mentors
+            )
+            if best_match:
+                best_mentor, score = best_match
+                self.match_service.create_match_with_ai(
+                    question_id=created["id"],
+                    mentor_id=best_mentor["user_id"],
+                    similarity_score=score,
+                )
+                created["status"] = "matched"
+
         return QuestionResponse(**created)
 
     def list_my_questions(self, student_id: int) -> list[QuestionResponse]:

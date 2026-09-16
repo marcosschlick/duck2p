@@ -3,6 +3,7 @@ from typing import Annotated
 from dtos.mentor_dto import (
     MentorApplicationItem,
     MentorApplyRequest,
+    MentorLeaderboardItem,
     MentorProfileResponse,
     MentorStatusResponse,
 )
@@ -91,3 +92,15 @@ def reject_application(
     return mentor_service.reject_application(
         current_user_id=current_user["id"], target_user_id=target_user_id
     )
+
+
+@router.get(
+    "/leaderboard",
+    response_model=list[MentorLeaderboardItem],
+    status_code=status.HTTP_200_OK,
+    summary="Listar ranking dos mentores da comunidade",
+)
+def get_leaderboard(
+    mentor_service: MentorServiceDep,
+) -> list[MentorLeaderboardItem]:
+    return mentor_service.get_leaderboard()

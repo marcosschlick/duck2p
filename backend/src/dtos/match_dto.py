@@ -23,7 +23,8 @@ class MatchDetailResponse(BaseModel):
     student_name: str
     mentor_id: int
     mentor_name: str
-    mentor_contact: str
+    similarity_score: float | None = None
+    ai_briefing: str | None = None
     status: str
     first_response_at: datetime | None = None
     completed_at: datetime | None = None

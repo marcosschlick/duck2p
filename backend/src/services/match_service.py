@@ -1,10 +1,14 @@
+import json
+
 from dtos.match_dto import MatchDetailResponse, MatchResponse
 from dtos.rating_dto import RatingCreateRequest, RatingResponse
 from fastapi import HTTPException, status
 from repositories.match_repository import MatchRepository
 from repositories.mentor_repository import MentorRepository
+from repositories.message_repository import MessageRepository
 from repositories.question_repository import QuestionRepository
 from repositories.rating_repository import RatingRepository
+from services.ai_service import AIService
 
 
 class MatchService:
@@ -14,11 +18,36 @@ class MatchService:
         question_repo: QuestionRepository | None = None,
         mentor_repo: MentorRepository | None = None,
         rating_repo: RatingRepository | None = None,
+        message_repo: MessageRepository | None = None,
+        ai_service: AIService | None = None,
     ):
         self.match_repo = match_repo or MatchRepository()
         self.question_repo = question_repo or QuestionRepository()
         self.mentor_repo = mentor_repo or MentorRepository()
         self.rating_repo = rating_repo or RatingRepository()
+        self.message_repo = message_repo or MessageRepository()
+        self.ai_service = ai_service or AIService()
+
+    def create_match_with_ai(
+        self, question_id: int, mentor_id: int, similarity_score: float
+    ) -> MatchResponse:
+        question = self.question_repo.find_by_id(question_id)
+        problem_desc = question["problem_description"] if question else ""
+        briefing = self.ai_service.generate_mentor_briefing(problem_desc)
+        match = self.match_repo.create(
+            question_id=question_id,
+            mentor_id=mentor_id,
+            similarity_score=similarity_score,
+            ai_briefing=briefing,
+        )
+        self.question_repo.update_status(question_id, "matched")
+        duck_greeting = self.ai_service.generate_duck_bot_greeting(problem_desc)
+        self.message_repo.create(
+            match_id=match["id"],
+            sender_id=None,
+            content=duck_greeting,
+        )
+        return MatchResponse(**match)
 
     def accept_question(self, mentor_id: int, question_id: int) -> MatchResponse:
         mentor = self.mentor_repo.find_by_user_id(mentor_id)
@@ -47,11 +76,20 @@ class MatchService:
                 detail="Esta dúvida já foi aceita ou resolvida.",
             )
 
-        match = self.match_repo.create(
-            question_id=question_id, mentor_id=mentor_id, similarity_score=1.0
+        score = 1.0
+        if question.get("embedding") and mentor.get("embedding"):
+            try:
+                q_vec = json.loads(question["embedding"])
+                m_vec = json.loads(mentor["embedding"])
+                score = round(
+                    self.ai_service.calculate_cosine_similarity(q_vec, m_vec), 4
+                )
+            except (json.JSONDecodeError, TypeError, ValueError):
+                score = 1.0
+
+        return self.create_match_with_ai(
+            question_id=question_id, mentor_id=mentor_id, similarity_score=score
         )
-        self.question_repo.update_status(question_id, "matched")
-        return MatchResponse(**match)
 
     def get_match_detail(self, user_id: int, match_id: int) -> MatchDetailResponse:
         detail = self.match_repo.find_detail_by_id(match_id)
@@ -120,5 +158,18 @@ class MatchService:
         self.rating_repo.apply_gamification(
             mentor_id=match["mentor_id"], added_points=total_points
         )
+
+        if data.was_resolved:
+            mentor_profile = self.mentor_repo.find_by_user_id(match["mentor_id"])
+            if mentor_profile:
+                current_skills = mentor_profile["skills"]
+                problem_snippet = question["problem_description"].strip()
+                updated_skills = f"{current_skills}, {problem_snippet}"
+                new_embedding = self.ai_service.generate_embedding_json(updated_skills)
+                self.mentor_repo.update_skills_and_embedding(
+                    user_id=match["mentor_id"],
+                    skills=updated_skills,
+                    embedding=new_embedding,
+                )
 
         return RatingResponse(**rating)

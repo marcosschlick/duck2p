@@ -1,16 +1,23 @@
 from dtos.mentor_dto import (
     MentorApplicationItem,
     MentorApplyRequest,
+    MentorLeaderboardItem,
     MentorProfileResponse,
     MentorStatusResponse,
 )
 from fastapi import HTTPException, status
 from repositories.mentor_repository import MentorRepository
+from services.ai_service import AIService
 
 
 class MentorService:
-    def __init__(self, mentor_repo: MentorRepository | None = None):
+    def __init__(
+        self,
+        mentor_repo: MentorRepository | None = None,
+        ai_service: AIService | None = None,
+    ):
         self.mentor_repo = mentor_repo or MentorRepository()
+        self.ai_service = ai_service or AIService()
 
     def apply(self, user_id: int, data: MentorApplyRequest) -> MentorProfileResponse:
         existing = self.mentor_repo.find_by_user_id(user_id)
@@ -23,11 +30,12 @@ class MentorService:
         approved_count = self.mentor_repo.count_approved()
         application_status = "approved" if approved_count == 0 else "pending"
         approved_by = user_id if approved_count == 0 else None
+        embedding = self.ai_service.generate_embedding_json(data.skills)
 
         result = self.mentor_repo.upsert_application(
             user_id=user_id,
-            contact=data.contact,
             skills=data.skills,
+            embedding=embedding,
             status=application_status,
             approved_by=approved_by,
         )
@@ -111,3 +119,7 @@ class MentorService:
             target_user_id, status="rejected", approved_by=current_user_id
         )
         return MentorProfileResponse(**updated)
+
+    def get_leaderboard(self) -> list[MentorLeaderboardItem]:
+        rows = self.mentor_repo.list_leaderboard()
+        return [MentorLeaderboardItem(**row) for row in rows]

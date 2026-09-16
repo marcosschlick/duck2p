@@ -36,7 +36,8 @@ class MatchRepository:
         query = """
             SELECT m.id, m.question_id, q.problem_description,
                    q.student_id, stu.full_name AS student_name,
-                   m.mentor_id, men.full_name AS mentor_name, mp.contact AS mentor_contact,
+                   m.mentor_id, men.full_name AS mentor_name,
+                   m.similarity_score, m.ai_briefing,
                    m.status, m.first_response_at, m.completed_at, m.created_at
             FROM matches m
             JOIN questions q ON q.id = m.question_id
@@ -54,7 +55,8 @@ class MatchRepository:
         query = """
             SELECT m.id, m.question_id, q.problem_description,
                    q.student_id, stu.full_name AS student_name,
-                   m.mentor_id, men.full_name AS mentor_name, mp.contact AS mentor_contact,
+                   m.mentor_id, men.full_name AS mentor_name,
+                   m.similarity_score, m.ai_briefing,
                    m.status, m.first_response_at, m.completed_at, m.created_at
             FROM matches m
             JOIN questions q ON q.id = m.question_id
