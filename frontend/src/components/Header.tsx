@@ -1,4 +1,5 @@
 import type { MentorStatus } from '../types'
+import logoMain from '../assets/logo_03.svg'
 
 interface HeaderProps {
   mentorStatus: MentorStatus | null
@@ -11,8 +12,11 @@ export function Header({ mentorStatus, onLogout }: HeaderProps) {
   return (
     <header className="app-header">
       <div className="brand-group">
-        <span className="brand-logo">duck2p</span>
-        <span className="brand-tagline">Rubber duck debugging colaborativo</span>
+        <div className="brand-logo-wrap">
+          <img src={logoMain} alt="Duck2P" className="brand-logo-img" />
+          <span className="brand-logo">Duck2P</span>
+        </div>
+        <span className="brand-tagline">Dúvidas de código? Aqui tem um pato. E pessoas também.</span>
       </div>
 
       <div className="header-actions">

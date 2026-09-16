@@ -268,6 +268,8 @@ function App() {
         }}
         onError={setErrorMessage}
         onSuccess={setSuccessMessage}
+        errorMessage={errorMessage}
+        successMessage={successMessage}
       />
     )
   }
