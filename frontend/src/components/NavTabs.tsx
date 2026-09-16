@@ -37,6 +37,13 @@ export function NavTabs({
       >
         Mentoria
       </button>
+      <button
+        type="button"
+        className={'nav-tab ' + (activeTab === 'ranking' ? 'active' : '')}
+        onClick={() => onSelectTab('ranking')}
+      >
+        Ranking
+      </button>
     </nav>
   )
 }

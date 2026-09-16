@@ -33,7 +33,7 @@ export function DuvidasTab({
     try {
       await questionApi.create(questionDescription.trim())
       setQuestionDescription('')
-      onSuccess('Dúvida publicada com sucesso! Aguarde um mentor aceitar.')
+      onSuccess('Dúvida enviada! O pareamento semântico por IA foi acionado.')
       onQuestionCreated()
     } catch (err: unknown) {
       onError(err instanceof Error ? err.message : 'Falha ao enviar dúvida.')
@@ -47,7 +47,7 @@ export function DuvidasTab({
       <section className="dashboard-card">
         <header className="card-header">
           <h2>Enviar Nova Dúvida</h2>
-          <p>Explique seu problema ou erro de código para receber apoio de um mentor.</p>
+          <p>Explique seu problema ou erro de código. A IA realizará o pareamento com o mentor ideal.</p>
         </header>
         <form className="card-form" onSubmit={handleSubmit}>
           <div className="form-group">

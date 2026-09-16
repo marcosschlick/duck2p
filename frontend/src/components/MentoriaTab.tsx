@@ -4,7 +4,7 @@ import type { MentorApplication, MentorStatus } from '../types'
 interface MentoriaTabProps {
   mentorStatus: MentorStatus | null
   applications: MentorApplication[]
-  onApply: (contact: string, skills: string) => Promise<void>
+  onApply: (skills: string) => Promise<void>
   onReview: (userId: number, action: 'approve' | 'reject') => Promise<void>
   onError: (msg: string) => void
   onSuccess: (msg: string) => void
@@ -17,7 +17,6 @@ export function MentoriaTab({
   onReview,
   onError,
 }: MentoriaTabProps) {
-  const [applyContact, setApplyContact] = useState('')
   const [applySkills, setApplySkills] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -25,15 +24,14 @@ export function MentoriaTab({
 
   const handleApplySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!applyContact.trim() || !applySkills.trim()) {
-      onError('Preencha seu contato e habilidades.')
+    if (!applySkills.trim()) {
+      onError('Preencha suas habilidades e linguagens.')
       return
     }
 
     setIsLoading(true)
     try {
-      await onApply(applyContact.trim(), applySkills.trim())
-      setApplyContact('')
+      await onApply(applySkills.trim())
       setApplySkills('')
     } catch (err: unknown) {
       onError(err instanceof Error ? err.message : 'Falha ao enviar candidatura.')
@@ -91,10 +89,6 @@ export function MentoriaTab({
               <p>
                 <strong>Habilidades:</strong> {mentorStatus?.profile?.skills}
               </p>
-              <p>
-                <strong>Contato de Atendimento:</strong>{' '}
-                {mentorStatus?.profile?.contact}
-              </p>
             </div>
           </section>
 
@@ -117,9 +111,6 @@ export function MentoriaTab({
                     </div>
                     <p className="item-text">
                       <strong>E-mail:</strong> {app.email}
-                    </p>
-                    <p className="item-text">
-                      <strong>Contato:</strong> {app.contact}
                     </p>
                     <p className="item-text">
                       <strong>Habilidades:</strong> {app.skills}
@@ -177,18 +168,6 @@ export function MentoriaTab({
               placeholder="Ex: Python, React, C++, Algoritmos e Estrutura de Dados"
               value={applySkills}
               onChange={(e) => setApplySkills(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="mentor_contact">Contato para Atendimento</label>
-            <input
-              id="mentor_contact"
-              type="text"
-              placeholder="Ex: Discord: @usuario ou WhatsApp: (11) 99999-9999"
-              value={applyContact}
-              onChange={(e) => setApplyContact(e.target.value)}
               required
             />
           </div>

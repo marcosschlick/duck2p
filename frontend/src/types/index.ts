@@ -1,5 +1,5 @@
 export type Screen = 'login' | 'register' | 'home'
-export type Tab = 'duvidas' | 'atendimentos' | 'mentoria'
+export type Tab = 'duvidas' | 'atendimentos' | 'mentoria' | 'ranking'
 
 export interface RegisterForm {
   full_name: string
@@ -21,7 +21,6 @@ export interface DecodedToken {
 
 export interface MentorProfile {
   user_id: number
-  contact: string
   skills: string
   is_available: boolean
   points: number
@@ -44,9 +43,19 @@ export interface MentorApplication {
   email: string
   student_id: string
   course: string
-  contact: string
   skills: string
   status: string
+}
+
+export interface MentorLeaderboardItem {
+  user_id: number
+  full_name: string
+  course: string
+  points: number
+  level: number
+  mentorships_completed: number
+  average_rating: number
+  skills: string
 }
 
 export interface QuestionOpen {
@@ -67,7 +76,8 @@ export interface MatchDetail {
   student_name: string
   mentor_id: number
   mentor_name: string
-  mentor_contact: string
+  similarity_score?: number | null
+  ai_briefing?: string | null
   status: string
   first_response_at: string | null
   completed_at: string | null
@@ -77,7 +87,7 @@ export interface MatchDetail {
 export interface MessageItem {
   id: number
   match_id: number
-  sender_id: number
+  sender_id?: number | null
   sender_name: string
   content: string
   created_at: string | null

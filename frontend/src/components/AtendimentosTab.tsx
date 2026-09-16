@@ -11,6 +11,12 @@ interface AtendimentosTabProps {
   onRequestRate: (m: MatchDetail) => void
 }
 
+function formatAffinity(score?: number | null): string {
+  if (score === null || score === undefined) return ''
+  const percent = Math.min(100, Math.max(0, Math.round(score * 100)))
+  return 'Afinidade: ' + percent + '%'
+}
+
 export function AtendimentosTab({
   matches,
   selectedMatch,
@@ -39,6 +45,7 @@ export function AtendimentosTab({
 
   if (selectedMatch) {
     const isStudent = currentUserId === selectedMatch.student_id
+    const isMentor = currentUserId === selectedMatch.mentor_id
 
     return (
       <div className="tab-container">
@@ -52,16 +59,20 @@ export function AtendimentosTab({
               >
                 ← Voltar para a lista
               </button>
-              <h2>
-                {isStudent
-                  ? 'Mentor: ' + selectedMatch.mentor_name
-                  : 'Aluno: ' + selectedMatch.student_name}
-              </h2>
-              <p className="chat-contact">
-                {isStudent
-                  ? 'Contato do Mentor: ' + selectedMatch.mentor_contact
-                  : 'Atendimento #' + selectedMatch.id}
-              </p>
+              <div className="chat-title-group">
+                <h2>
+                  {isStudent
+                    ? 'Mentor: ' + selectedMatch.mentor_name
+                    : 'Aluno: ' + selectedMatch.student_name}
+                </h2>
+                {selectedMatch.similarity_score !== undefined &&
+                  selectedMatch.similarity_score !== null && (
+                    <span className="affinity-badge">
+                      {formatAffinity(selectedMatch.similarity_score)}
+                    </span>
+                  )}
+              </div>
+              <p className="chat-contact">Atendimento #{selectedMatch.id}</p>
             </div>
 
             {isStudent && (
@@ -76,25 +87,45 @@ export function AtendimentosTab({
           </header>
 
           <div className="chat-question-banner">
-            <strong>Dúvida:</strong> {selectedMatch.problem_description}
+            <strong>Dúvida do Aluno:</strong> {selectedMatch.problem_description}
           </div>
+
+          {isMentor && selectedMatch.ai_briefing && (
+            <div className="chat-briefing-card">
+              <div className="briefing-header">
+                <span className="briefing-icon">🦆</span>
+                <strong>Briefing Pedagógico da IA (Exclusivo do Mentor)</strong>
+              </div>
+              <div className="briefing-content">{selectedMatch.ai_briefing}</div>
+            </div>
+          )}
 
           <div className="chat-messages">
             {messages.length === 0 ? (
               <p className="empty-state">Nenhuma mensagem ainda. Inicie o diálogo!</p>
             ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={
-                    'message-bubble ' +
-                    (msg.is_mine ? 'message-mine' : 'message-other')
-                  }
-                >
-                  <span className="message-sender">{msg.sender_name}</span>
-                  <p className="message-text">{msg.content}</p>
-                </div>
-              ))
+              messages.map((msg) => {
+                const isDuckBot = msg.sender_name === 'Duck Bot' || msg.sender_id === null
+                return (
+                  <div
+                    key={msg.id}
+                    className={
+                      'message-bubble ' +
+                      (isDuckBot
+                        ? 'message-duckbot'
+                        : msg.is_mine
+                        ? 'message-mine'
+                        : 'message-other')
+                    }
+                  >
+                    <span className="message-sender">
+                      {isDuckBot && '🦆 '}
+                      {msg.sender_name}
+                    </span>
+                    <p className="message-text">{msg.content}</p>
+                  </div>
+                )
+              })
             )}
             <div ref={chatEndRef} />
           </div>
@@ -137,9 +168,9 @@ export function AtendimentosTab({
                     <span className="item-author">
                       {isStudent ? 'Mentor: ' + m.mentor_name : 'Aluno: ' + m.student_name}
                     </span>
-                    {isStudent && (
-                      <span className="item-contact">
-                        Contato: {m.mentor_contact}
+                    {m.similarity_score !== undefined && m.similarity_score !== null && (
+                      <span className="affinity-badge">
+                        {formatAffinity(m.similarity_score)}
                       </span>
                     )}
                   </div>

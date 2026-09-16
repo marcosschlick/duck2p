@@ -157,17 +157,23 @@ export function AuthCard({
           </div>
 
           <div className="form-group">
-            <label htmlFor="course">Curso</label>
-            <input
+            <label htmlFor="course">Curso (IFSUL)</label>
+            <select
               id="course"
-              type="text"
-              placeholder="Ex: Ciência da Computação"
               value={registerData.course}
               onChange={(e) =>
                 setRegisterData({ ...registerData, course: e.target.value })
               }
               required
-            />
+            >
+              <option value="">Selecione seu curso...</option>
+              <option value="Análise e Desenvolvimento de Sistemas">
+                Análise e Desenvolvimento de Sistemas
+              </option>
+              <option value="Técnico em Informática (Integrado)">
+                Técnico em Informática (Integrado)
+              </option>
+            </select>
           </div>
 
           <div className="form-group">

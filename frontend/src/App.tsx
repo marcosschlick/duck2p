@@ -3,6 +3,7 @@ import './App.css'
 import type {
   MatchDetail,
   MentorApplication,
+  MentorLeaderboardItem,
   MentorStatus,
   MessageItem,
   QuestionOpen,
@@ -15,6 +16,7 @@ import { NavTabs } from './components/NavTabs'
 import { DuvidasTab } from './components/DuvidasTab'
 import { AtendimentosTab } from './components/AtendimentosTab'
 import { MentoriaTab } from './components/MentoriaTab'
+import { RankingTab } from './components/RankingTab'
 import { RatingModal } from './components/RatingModal'
 import { AuthCard } from './components/AuthCard'
 
@@ -31,6 +33,8 @@ function App() {
   const [messages, setMessages] = useState<MessageItem[]>([])
   const [openQuestions, setOpenQuestions] = useState<QuestionOpen[]>([])
   const [mentorApplications, setMentorApplications] = useState<MentorApplication[]>([])
+  const [leaderboard, setLeaderboard] = useState<MentorLeaderboardItem[]>([])
+  const [isLeaderboardLoading, setIsLeaderboardLoading] = useState(false)
   const [ratingModalMatch, setRatingModalMatch] = useState<MatchDetail | null>(null)
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -52,6 +56,7 @@ function App() {
     setMessages([])
     setOpenQuestions([])
     setMentorApplications([])
+    setLeaderboard([])
     clearFeedback()
     setScreen('login')
   }, [clearFeedback])
@@ -89,6 +94,18 @@ function App() {
       setMentorApplications(data)
     } catch {
       return
+    }
+  }, [])
+
+  const fetchLeaderboard = useCallback(async () => {
+    setIsLeaderboardLoading(true)
+    try {
+      const data = await mentorApi.getLeaderboard()
+      setLeaderboard(data)
+    } catch {
+      return
+    } finally {
+      setIsLeaderboardLoading(false)
     }
   }, [])
 
@@ -144,6 +161,9 @@ function App() {
         void fetchMentorApplications()
       }
     }
+    if (tab === 'ranking') {
+      void fetchLeaderboard()
+    }
     startTransition(() => {
       setActiveTab(tab)
     })
@@ -177,15 +197,16 @@ function App() {
     }
   }
 
-  const handleApplyMentor = async (contact: string, skills: string) => {
+  const handleApplyMentor = async (skills: string) => {
     clearFeedback()
-    const profile = await mentorApi.apply(contact, skills)
+    const profile = await mentorApi.apply(skills)
     setSuccessMessage(
       profile.status === 'approved'
         ? 'Parabéns! Você é o primeiro mentor e foi aprovado automaticamente!'
         : 'Candidatura enviada com sucesso! Aguarde a avaliação de um mentor.'
     )
     await fetchMentorStatus()
+    await fetchLeaderboard()
   }
 
   const handleReviewApplication = async (
@@ -200,6 +221,7 @@ function App() {
         : 'Candidatura rejeitada com sucesso.'
     )
     await fetchMentorApplications()
+    await fetchLeaderboard()
   }
 
   const handleRateMatch = async (
@@ -221,9 +243,15 @@ function App() {
       setSelectedMatch(null)
       await fetchActiveMatches()
       await fetchMentorStatus()
+      await fetchLeaderboard()
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Erro ao avaliar atendimento.')
     }
+  }
+
+  const handleQuestionCreated = async () => {
+    await fetchOpenQuestions()
+    await fetchActiveMatches()
   }
 
   if (screen !== 'home') {
@@ -263,7 +291,7 @@ function App() {
             isMentor={Boolean(mentorStatus?.is_mentor)}
             openQuestions={openQuestions}
             onAcceptQuestion={handleAcceptQuestion}
-            onQuestionCreated={fetchOpenQuestions}
+            onQuestionCreated={handleQuestionCreated}
             onError={setErrorMessage}
             onSuccess={setSuccessMessage}
           />
@@ -289,6 +317,13 @@ function App() {
             onReview={handleReviewApplication}
             onError={setErrorMessage}
             onSuccess={setSuccessMessage}
+          />
+        )}
+
+        {activeTab === 'ranking' && (
+          <RankingTab
+            leaderboard={leaderboard}
+            isLoading={isLeaderboardLoading}
           />
         )}
       </main>

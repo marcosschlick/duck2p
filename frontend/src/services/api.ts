@@ -3,6 +3,7 @@ import type {
   LoginForm,
   MatchDetail,
   MentorApplication,
+  MentorLeaderboardItem,
   MentorProfile,
   MentorStatus,
   MessageItem,
@@ -79,11 +80,11 @@ export const mentorApi = {
     return parseApiResponse<MentorStatus>(response)
   },
 
-  async apply(contact: string, skills: string): Promise<MentorProfile> {
+  async apply(skills: string): Promise<MentorProfile> {
     const response = await fetch(API_BASE_URL + '/mentors/apply', {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ contact, skills }),
+      body: JSON.stringify({ skills }),
     })
     return parseApiResponse<MentorProfile>(response)
   },
@@ -107,6 +108,13 @@ export const mentorApi = {
       }
     )
     return parseApiResponse<MentorProfile>(response)
+  },
+
+  async getLeaderboard(): Promise<MentorLeaderboardItem[]> {
+    const response = await fetch(API_BASE_URL + '/mentors/leaderboard', {
+      headers: getAuthHeaders(),
+    })
+    return parseApiResponse<MentorLeaderboardItem[]>(response)
   },
 }
 
