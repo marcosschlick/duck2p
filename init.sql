@@ -4,13 +4,12 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(150) UNIQUE NOT NULL,
     student_id VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    course VARCHAR(50) NOT NULL,
+    course VARCHAR(100) NOT NULL CHECK (course IN ('Análise e Desenvolvimento de Sistemas', 'Técnico em Informática (Integrado)')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS mentor_profiles (
     user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    contact VARCHAR(100) NOT NULL,
     skills TEXT NOT NULL,
     embedding TEXT,
     is_available BOOLEAN DEFAULT TRUE,
@@ -46,7 +45,7 @@ CREATE TABLE IF NOT EXISTS matches (
 CREATE TABLE IF NOT EXISTS messages (
     id SERIAL PRIMARY KEY,
     match_id INTEGER NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
-    sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    sender_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

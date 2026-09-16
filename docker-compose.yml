@@ -27,6 +27,7 @@ services:
       DB_USER: ${DB_USER:-duck}
       DB_PASSWORD: ${DB_PASSWORD:-duckpass}
       DB_NAME: ${DB_NAME:-duck2p_db}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     volumes:
       - ./backend/src:/app/src
     depends_on:
