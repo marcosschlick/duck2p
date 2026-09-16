@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS mentor_profiles (
     points INTEGER DEFAULT 0,
     level INTEGER DEFAULT 1,
     mentorships_completed INTEGER DEFAULT 0,
-    average_rating REAL DEFAULT 5.0
+    average_rating REAL DEFAULT 5.0,
+    status VARCHAR(20) DEFAULT 'pending',
+    approved_by INTEGER REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS questions (
