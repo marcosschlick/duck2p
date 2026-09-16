@@ -1,5 +1,5 @@
 from controllers.auth_controller import router as auth_router
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
