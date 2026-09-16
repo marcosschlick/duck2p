@@ -1,11 +1,11 @@
 :root {
-  --color-primary: #73030D;       
-  --color-primary-hover: #732F3B; 
-  --color-bg: #F2F2F2;            
-  --color-surface: #FFFFFF;       
-  --color-border: #8C8C8C;        
-  --color-text: #0D0D0D;          
-  --color-text-muted: #666666;    
+  --color-primary: #73030D;
+  --color-primary-hover: #732F3B;
+  --color-bg: #F2F2F2;
+  --color-surface: #FFFFFF;
+  --color-border: #8C8C8C;
+  --color-text: #0D0D0D;
+  --color-text-muted: #666666;
 }
 
 * {
@@ -20,16 +20,15 @@ body {
   color: var(--color-text);
   line-height: 1.5;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
   width: 100%;
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1.5rem;
+  flex-direction: column;
 }

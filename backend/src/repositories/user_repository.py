@@ -44,3 +44,14 @@ class UserRepository:
         with get_db_connection() as conn, conn.cursor() as cur:
             cur.execute(query, (student_id,))
             return cur.fetchone()
+
+    @staticmethod
+    def find_by_id(user_id: int) -> dict | None:
+        query = """
+            SELECT id, full_name, email, student_id, password_hash, course, created_at
+            FROM users
+            WHERE id = %s;
+        """
+        with get_db_connection() as conn, conn.cursor() as cur:
+            cur.execute(query, (user_id,))
+            return cur.fetchone()

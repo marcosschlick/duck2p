@@ -28,6 +28,14 @@ Mantenha a divisão estrita em camadas:
 * `models/`: Entidades e estruturas de dados representativas das tabelas.
 * `database.py`: Conexão direta com o banco.
 
+## Arquitetura do Frontend (`frontend/src/`)
+Mantenha a divisão modular e com responsabilidade única:
+* `components/`: Componentes visuais com responsabilidade clara (cabeçalho, abas, chat e modais).
+* `services/`: Comunicação com a API via `fetch` nativo, envio de token e tratamento seguro de respostas.
+* `types/`: Interfaces e tipos TypeScript centralizados.
+* `styles/`: Estilos em CSS puro e variáveis do `:root` organizados por módulo.
+* `App.tsx`: Orquestração simples de telas, abas e estados compartilhados.
+
 ## Paleta de Cores Obrigatória (CSS Nativo)
 Utilize rigorosamente as variáveis de cores padronizadas:
 * `--color-primary: #73030D;` (Crimson / Primária: destaques principais, botões de ação, cabeçalho do card de match e detalhes da marca)
