@@ -1,5 +1,8 @@
 from controllers.auth_controller import router as auth_router
-from fastapi import FastAPI, Request, status
+from controllers.match_controller import router as match_router
+from controllers.mentor_controller import router as mentor_router
+from controllers.question_controller import router as question_router
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -17,6 +20,9 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(mentor_router)
+app.include_router(question_router)
+app.include_router(match_router)
 
 
 @app.get("/")

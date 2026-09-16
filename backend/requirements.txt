@@ -3,3 +3,5 @@ uvicorn
 bcrypt
 pyjwt
 psycopg[binary]
+fastembed
+google-genai

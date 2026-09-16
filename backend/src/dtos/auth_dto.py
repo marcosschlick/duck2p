@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -7,7 +8,9 @@ class UserRegisterRequest(BaseModel):
     full_name: str
     email: str
     student_id: str
-    course: str
+    course: Literal[
+        "Análise e Desenvolvimento de Sistemas", "Técnico em Informática (Integrado)"
+    ]
     password: str
 
 

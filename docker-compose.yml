@@ -15,6 +15,40 @@ services:
     networks:
       - duck2p_network
 
+  backend:
+    build: ./backend
+    container_name: duck2p_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-duck}
+      DB_PASSWORD: ${DB_PASSWORD:-duckpass}
+      DB_NAME: ${DB_NAME:-duck2p_db}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      - ./backend/src:/app/src
+    depends_on:
+      - db
+    networks:
+      - duck2p_network
+
+  frontend:
+    build: ./frontend
+    container_name: duck2p_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - duck2p_network
+
 volumes:
   duck2p_pgdata: {}
 
