@@ -1,34 +1,36 @@
 -- init.sql
-CREATE TABLE IF NOT EXISTS mentors (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    student_id VARCHAR(50) UNIQUE NOT NULL, 
+    password_hash VARCHAR(255) NOT NULL,
     course VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS mentor_profiles (
+    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     contact VARCHAR(100) NOT NULL,
     skills TEXT NOT NULL,
-    embedding TEXT
+    embedding TEXT,
+    is_available BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS questions (
     id SERIAL PRIMARY KEY,
-    student_name VARCHAR(100) NOT NULL,
-    course VARCHAR(50) NOT NULL,
+    student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     problem_description TEXT NOT NULL,
     embedding TEXT,
-    status VARCHAR(20) DEFAULT 'pending',
+    status VARCHAR(20) DEFAULT 'pending', 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS matches (
     id SERIAL PRIMARY KEY,
     question_id INTEGER REFERENCES questions(id) ON DELETE CASCADE,
-    mentor_id INTEGER REFERENCES mentors(id) ON DELETE CASCADE,
+    mentor_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     similarity_score REAL,
     ai_briefing TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- Initial mock data for testing
-INSERT INTO mentors (name, course, contact, skills) VALUES
-('Lucas Silva', 'TADS 4th Semester', '@lucas_dev', 'C language, pointers, malloc dynamic memory, segmentation fault'),
-('Mariana Souza', 'TADS 6th Semester', '@mari_tech', 'Python, FastAPI, Docker, PostgreSQL database'),
-('Carlos Pereira', 'Internet Informatics', '@carlinhos', 'HTML, CSS, basic JavaScript, programming logic');
