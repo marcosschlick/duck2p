@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { MatchDetail, MessageItem } from '../types'
+import { DuckScene } from './DuckScene/DuckScene'
 
 interface AtendimentosTabProps {
   matches: MatchDetail[]
@@ -49,56 +50,48 @@ export function AtendimentosTab({
 
     return (
       <div className="tab-container">
-        <section className="chat-container">
-          <header className="chat-header">
-            <div className="chat-header-info">
-              <button
-                type="button"
-                className="btn-link"
-                onClick={() => onSelectMatch(null)}
-              >
-                ← Voltar para a lista
-              </button>
-              <div className="chat-title-group">
-                <h2>
-                  {isStudent
-                    ? 'Mentor: ' + selectedMatch.mentor_name
-                    : 'Aluno: ' + selectedMatch.student_name}
-                </h2>
-                {selectedMatch.similarity_score !== undefined &&
-                  selectedMatch.similarity_score !== null && (
-                    <span className="affinity-badge">
-                      {formatAffinity(selectedMatch.similarity_score)}
-                    </span>
-                  )}
+        <div className="duck-main-layout">
+          <div className="duck-chat-column">
+            <section className="chat-container">
+              <header className="chat-header">
+                <div className="chat-header-info">
+                  <button
+                    type="button"
+                    className="btn-link"
+                    onClick={() => onSelectMatch(null)}
+                  >
+                    ← Voltar para a lista
+                  </button>
+                  <div className="chat-title-group">
+                    <h2>
+                      {isStudent
+                        ? 'Mentor: ' + selectedMatch.mentor_name
+                        : 'Aluno: ' + selectedMatch.student_name}
+                    </h2>
+                    {selectedMatch.similarity_score !== undefined &&
+                      selectedMatch.similarity_score !== null && (
+                        <span className="affinity-badge">
+                          {formatAffinity(selectedMatch.similarity_score)}
+                        </span>
+                      )}
+                  </div>
+                  <p className="chat-contact">Atendimento #{selectedMatch.id}</p>
+                </div>
+
+                {isStudent && (
+                  <button
+                    type="button"
+                    className="btn-primary btn-complete"
+                    onClick={() => onRequestRate(selectedMatch)}
+                  >
+                    Concluir e Avaliar
+                  </button>
+                )}
+              </header>
+
+              <div className="chat-question-banner">
+                <strong>Dúvida do Aluno:</strong> {selectedMatch.problem_description}
               </div>
-              <p className="chat-contact">Atendimento #{selectedMatch.id}</p>
-            </div>
-
-            {isStudent && (
-              <button
-                type="button"
-                className="btn-primary btn-complete"
-                onClick={() => onRequestRate(selectedMatch)}
-              >
-                Concluir e Avaliar
-              </button>
-            )}
-          </header>
-
-          <div className="chat-question-banner">
-            <strong>Dúvida do Aluno:</strong> {selectedMatch.problem_description}
-          </div>
-
-          {isMentor && selectedMatch.ai_briefing && (
-            <div className="chat-briefing-card">
-              <div className="briefing-header">
-                <span className="briefing-icon">🦆</span>
-                <strong>Briefing Pedagógico da IA (Exclusivo do Mentor)</strong>
-              </div>
-              <div className="briefing-content">{selectedMatch.ai_briefing}</div>
-            </div>
-          )}
 
           <div className="chat-messages">
             {messages.length === 0 ? (
@@ -130,22 +123,50 @@ export function AtendimentosTab({
             <div ref={chatEndRef} />
           </div>
 
-          <form className="chat-form" onSubmit={handleSend}>
-            <input
-              type="text"
-              placeholder="Digite sua mensagem de suporte..."
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              required
-            />
-            <button type="submit" className="btn-primary">
-              Enviar
-            </button>
-          </form>
-        </section>
+            <form className="chat-form" onSubmit={handleSend}>
+              <input
+                type="text"
+                placeholder="Digite sua mensagem de suporte..."
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                required
+              />
+              <button type="submit" className="btn-primary">
+                Enviar
+              </button>
+            </form>
+          </section>
+        </div>
+
+        <aside className="duck-scene-column">
+          <div className="duck-3d-wrapper">
+            <DuckScene />
+          </div>
+
+          {isMentor && selectedMatch.ai_briefing ? (
+            <div className="chat-briefing-card">
+              <div className="briefing-header">
+                <span className="briefing-icon">🦆</span>
+                <strong>Briefing Pedagógico da IA (Exclusivo do Mentor)</strong>
+              </div>
+              <div className="briefing-content">{selectedMatch.ai_briefing}</div>
+            </div>
+          ) : (
+            <div className="chat-briefing-card">
+              <div className="briefing-header">
+                <span className="briefing-icon">🦆</span>
+                <strong>Rubber Duck Debugging</strong>
+              </div>
+              <div className="briefing-content">
+                Explique seu raciocínio passo a passo. Descrever o problema com clareza ajuda a estruturar o pensamento e encontrar a solução.
+              </div>
+            </div>
+          )}
+        </aside>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="tab-container">
