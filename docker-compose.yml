@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:17
+    container_name: duck2p_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-duck}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-duckpass}
+      POSTGRES_DB: ${DB_NAME:-duck2p_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - duck2p_pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - duck2p_network
+
+volumes:
+  duck2p_pgdata: {}
+
+networks:
+  duck2p_network:
+    driver: bridge
