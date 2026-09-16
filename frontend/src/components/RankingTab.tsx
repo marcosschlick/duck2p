@@ -6,13 +6,21 @@ interface RankingTabProps {
 }
 
 export function RankingTab({ leaderboard, isLoading }: RankingTabProps) {
+  const getCleanSkills = (rawSkills: string) => {
+    return rawSkills
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0 && s.length < 35)
+      .slice(0, 5)
+  }
+
   return (
     <div className="tab-container">
       <section className="dashboard-card">
         <header className="card-header">
           <h2>Ranking da Comunidade</h2>
           <p>
-            Mentores voluntários do IFSUL reconhecidos pelo engajamento e qualidade nas mentorias.
+            Mentores voluntários do IFSUL reconhecidos pelo engajamento e pontuação nas mentorias.
           </p>
         </header>
 
@@ -31,13 +39,13 @@ export function RankingTab({ leaderboard, isLoading }: RankingTabProps) {
                   <th className="th-level">Nível</th>
                   <th className="th-points">Pontuação</th>
                   <th className="th-completed">Atendimentos</th>
-                  <th className="th-rating">Avaliação</th>
                 </tr>
               </thead>
               <tbody>
                 {leaderboard.map((mentor, index) => {
                   const rank = index + 1
                   const isPodium = rank <= 3
+                  const skills = getCleanSkills(mentor.skills)
                   return (
                     <tr key={mentor.user_id} className={isPodium ? 'podium-row podium-' + rank : ''}>
                       <td className="td-rank">
@@ -48,7 +56,15 @@ export function RankingTab({ leaderboard, isLoading }: RankingTabProps) {
                       <td className="td-mentor">
                         <div className="mentor-name-cell">
                           <span className="mentor-fullname">{mentor.full_name}</span>
-                          <span className="mentor-skills-preview">{mentor.skills}</span>
+                          {skills.length > 0 && (
+                            <div className="mentor-skills-tags">
+                              {skills.map((skill) => (
+                                <span key={skill} className="skill-pill">
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="td-course">{mentor.course}</td>
@@ -59,11 +75,6 @@ export function RankingTab({ leaderboard, isLoading }: RankingTabProps) {
                         <strong>{mentor.points}</strong> pts
                       </td>
                       <td className="td-completed">{mentor.mentorships_completed}</td>
-                      <td className="td-rating">
-                        <span className="rating-pill">
-                          ★ {mentor.average_rating ? mentor.average_rating.toFixed(1) : '5.0'}
-                        </span>
-                      </td>
                     </tr>
                   )
                 })}
@@ -75,3 +86,4 @@ export function RankingTab({ leaderboard, isLoading }: RankingTabProps) {
     </div>
   )
 }
+

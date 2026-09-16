@@ -1,6 +1,15 @@
 export type Screen = 'login' | 'register' | 'home'
 export type Tab = 'duvidas' | 'atendimentos' | 'mentoria' | 'ranking'
 
+export interface UserProfile {
+  id: number
+  full_name: string
+  email: string
+  student_id: string
+  course: string
+  created_at?: string | null
+}
+
 export interface RegisterForm {
   full_name: string
   email: string
@@ -56,6 +65,15 @@ export interface MentorLeaderboardItem {
   mentorships_completed: number
   average_rating: number
   skills: string
+}
+
+export interface QuestionItem {
+  id: number
+  student_id: number
+  problem_description: string
+  status: string
+  created_at: string | null
+  match_id?: number | null
 }
 
 export interface QuestionOpen {

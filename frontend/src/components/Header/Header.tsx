@@ -22,11 +22,6 @@ export function Header({ onLogout, userEmail }: HeaderProps) {
       </div>
 
       <div className="header-actions">
-        <div className="header-status">
-          <span className="status-dot" aria-hidden="true" />
-          <span>Online</span>
-        </div>
-
         <button
           type="button"
           className="header-profile-btn"

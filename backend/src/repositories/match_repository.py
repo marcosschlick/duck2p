@@ -62,9 +62,8 @@ class MatchRepository:
             JOIN questions q ON q.id = m.question_id
             JOIN users stu ON stu.id = q.student_id
             JOIN users men ON men.id = m.mentor_id
-            JOIN mentor_profiles mp ON mp.user_id = m.mentor_id
-            WHERE (q.student_id = %s OR m.mentor_id = %s) AND m.status = 'active'
-            ORDER BY m.created_at DESC;
+            WHERE (q.student_id = %s OR m.mentor_id = %s)
+            ORDER BY CASE WHEN m.status = 'active' THEN 0 ELSE 1 END, m.created_at DESC;
         """
         with get_db_connection() as conn, conn.cursor() as cur:
             cur.execute(query, (user_id, user_id))

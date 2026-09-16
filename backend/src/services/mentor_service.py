@@ -20,24 +20,13 @@ class MentorService:
         self.ai_service = ai_service or AIService()
 
     def apply(self, user_id: int, data: MentorApplyRequest) -> MentorProfileResponse:
-        existing = self.mentor_repo.find_by_user_id(user_id)
-        if existing and existing["status"] == "approved":
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Usuário já é um mentor aprovado.",
-            )
-
-        approved_count = self.mentor_repo.count_approved()
-        application_status = "approved" if approved_count == 0 else "pending"
-        approved_by = user_id if approved_count == 0 else None
         embedding = self.ai_service.generate_embedding_json(data.skills)
-
         result = self.mentor_repo.upsert_application(
             user_id=user_id,
             skills=data.skills,
             embedding=embedding,
-            status=application_status,
-            approved_by=approved_by,
+            status="approved",
+            approved_by=user_id,
         )
         return MentorProfileResponse(**result)
 

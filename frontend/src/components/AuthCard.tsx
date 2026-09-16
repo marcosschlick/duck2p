@@ -146,7 +146,9 @@ export function AuthCard({
             </div>
           </div>
           <div className="auth-pillar-item">
-            <span className="auth-pillar-icon">🦆</span>
+            <span className="auth-pillar-icon">
+              <img src={logoIcon} alt="Duck2P" style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle' }} />
+            </span>
             <div className="auth-pillar-text">
               <strong>O pato te direciona</strong>
               <span>A IA analisa o seu problema e faz o pareamento com o mentor ideal.</span>

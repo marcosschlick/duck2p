@@ -76,13 +76,10 @@ function DuckModel({ isThinking }: DuckModelProps) {
   return (
     <group ref={groupRef} dispose={null}>
       <Center>
-        <primitive object={enhancedScene} scale={1.85} />
+        <primitive object={enhancedScene} scale={1.55} />
       </Center>
-      <Html position={[0.85, 1.1, 0]} center distanceFactor={6}>
+      <Html position={[0.45, 1.0, 0]} center distanceFactor={6}>
         <div className="duck-annotation">
-          <svg className="duck-annotation-icon" viewBox="0 0 24 24">
-            <path d="M12 2a4 4 0 0 0-4 4c0 .8.24 1.55.65 2.18L4 12c-1.1 1.1-1.1 2.9 0 4l3 3c1.1 1.1 2.9 1.1 4 0l3.82-3.82c.63.41 1.38.65 2.18.65a4 4 0 0 0 4-4c0-1.3-.63-2.45-1.6-3.17L18.4 6.4C18.15 3.9 16.27 2 13.75 2H12Z" />
-          </svg>
           <span>{isThinking ? 'Pensando na resposta...' : 'Quack quack, quack!'}</span>
         </div>
       </Html>
@@ -101,7 +98,7 @@ export function DuckScene({ isThinking = false }: DuckSceneProps) {
     <section className="duck-scene-container" aria-label="Rubber duck 3D assistant">
       <div className="duck-canvas-wrapper">
         <Canvas
-          camera={{ position: [0, 0.25, 3.1], fov: 60 }}
+          camera={{ position: [0, 0.15, 3.2], fov: 55 }}
           shadows
           gl={{
             antialias: true,

@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, useTransition } from 'react'
 import './App.css'
 import type {
   MatchDetail,
-  MentorApplication,
   MentorLeaderboardItem,
   MentorStatus,
   MessageItem,
+  QuestionItem,
   QuestionOpen,
   Screen,
   Tab,
@@ -15,10 +15,11 @@ import { Header } from './components/Header'
 import { NavTabs } from './components/NavTabs'
 import { DuvidasTab } from './components/DuvidasTab'
 import { AtendimentosTab } from './components/AtendimentosTab'
-import { MentoriaTab } from './components/MentoriaTab'
 import { RankingTab } from './components/RankingTab'
 import { RatingModal } from './components/RatingModal'
+import { ProfileModal } from './components/ProfileModal'
 import { AuthCard } from './components/AuthCard'
+import { Footer } from './components/Footer'
 
 function App() {
   const [screen, setScreen] = useState<Screen>(() => {
@@ -32,10 +33,12 @@ function App() {
   const [selectedMatch, setSelectedMatch] = useState<MatchDetail | null>(null)
   const [messages, setMessages] = useState<MessageItem[]>([])
   const [openQuestions, setOpenQuestions] = useState<QuestionOpen[]>([])
-  const [mentorApplications, setMentorApplications] = useState<MentorApplication[]>([])
+  const [myQuestions, setMyQuestions] = useState<QuestionItem[]>([])
   const [leaderboard, setLeaderboard] = useState<MentorLeaderboardItem[]>([])
   const [isLeaderboardLoading, setIsLeaderboardLoading] = useState(false)
   const [ratingModalMatch, setRatingModalMatch] = useState<MatchDetail | null>(null)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isCreatingNewQuestion, setIsCreatingNewQuestion] = useState(false)
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -55,8 +58,10 @@ function App() {
     setSelectedMatch(null)
     setMessages([])
     setOpenQuestions([])
-    setMentorApplications([])
+    setMyQuestions([])
     setLeaderboard([])
+    setIsProfileOpen(false)
+    setIsCreatingNewQuestion(false)
     clearFeedback()
     setScreen('login')
   }, [clearFeedback])
@@ -88,10 +93,10 @@ function App() {
     }
   }, [])
 
-  const fetchMentorApplications = useCallback(async () => {
+  const fetchMyQuestions = useCallback(async () => {
     try {
-      const data = await mentorApi.getApplications()
-      setMentorApplications(data)
+      const data = await questionApi.getMy()
+      setMyQuestions(data)
     } catch {
       return
     }
@@ -123,43 +128,49 @@ function App() {
     const timer = setTimeout(() => {
       void fetchMentorStatus()
       void fetchActiveMatches()
-    }, 0)
-    return () => clearTimeout(timer)
-  }, [screen, fetchMentorStatus, fetchActiveMatches])
-
-  useEffect(() => {
-    if (screen !== 'home' || !mentorStatus?.is_mentor) return
-    const timer = setTimeout(() => {
       void fetchOpenQuestions()
-      void fetchMentorApplications()
+      void fetchMyQuestions()
+      void fetchLeaderboard()
     }, 0)
     return () => clearTimeout(timer)
-  }, [screen, mentorStatus?.is_mentor, fetchOpenQuestions, fetchMentorApplications])
+  }, [screen, fetchMentorStatus, fetchActiveMatches, fetchOpenQuestions, fetchMyQuestions, fetchLeaderboard])
+
+  const studentActiveMatch = activeMatches.find(
+    (m) => m.student_id === currentUserId && m.status === 'active'
+  ) ?? null
+
+  const activeStudentMatch = isCreatingNewQuestion
+    ? null
+    : selectedMatch && selectedMatch.student_id === currentUserId && selectedMatch.status === 'active'
+    ? selectedMatch
+    : studentActiveMatch
+
+  const pendingStudentQuestion = isCreatingNewQuestion
+    ? null
+    : myQuestions.find((q) => q.status === 'pending') ?? null
+
+  const currentChatMatchId = activeTab === 'duvidas' ? activeStudentMatch?.id : selectedMatch?.id
 
   useEffect(() => {
-    if (!selectedMatch) return
+    if (!currentChatMatchId) return
     const timer = setTimeout(() => {
-      void fetchMessages(selectedMatch.id)
+      void fetchMessages(currentChatMatchId)
     }, 0)
     const interval = setInterval(() => {
-      void fetchMessages(selectedMatch.id)
+      void fetchMessages(currentChatMatchId)
     }, 3000)
     return () => {
       clearTimeout(timer)
       clearInterval(interval)
     }
-  }, [selectedMatch, fetchMessages])
+  }, [currentChatMatchId, fetchMessages])
 
   const handleSelectTab = (tab: Tab) => {
     clearFeedback()
     if (tab === 'atendimentos') {
       void fetchActiveMatches()
-    }
-    if (tab === 'mentoria') {
-      void fetchMentorStatus()
-      if (mentorStatus?.is_mentor) {
-        void fetchMentorApplications()
-      }
+      void fetchOpenQuestions()
+      void fetchMyQuestions()
     }
     if (tab === 'ranking') {
       void fetchLeaderboard()
@@ -188,40 +199,22 @@ function App() {
   }
 
   const handleSendMessage = async (content: string) => {
-    if (!selectedMatch) return
+    const targetMatchId = activeTab === 'duvidas' ? activeStudentMatch?.id : selectedMatch?.id
+    if (!targetMatchId) return
     try {
-      await matchApi.sendMessage(selectedMatch.id, content)
-      await fetchMessages(selectedMatch.id)
+      await matchApi.sendMessage(targetMatchId, content)
+      await fetchMessages(targetMatchId)
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Erro ao enviar mensagem.')
     }
   }
 
-  const handleApplyMentor = async (skills: string) => {
+  const handleSaveSkills = async (skills: string) => {
     clearFeedback()
-    const profile = await mentorApi.apply(skills)
-    setSuccessMessage(
-      profile.status === 'approved'
-        ? 'Parabéns! Você é o primeiro mentor e foi aprovado automaticamente!'
-        : 'Candidatura enviada com sucesso! Aguarde a avaliação de um mentor.'
-    )
+    await mentorApi.apply(skills)
     await fetchMentorStatus()
     await fetchLeaderboard()
-  }
-
-  const handleReviewApplication = async (
-    targetUserId: number,
-    action: 'approve' | 'reject'
-  ) => {
-    clearFeedback()
-    await mentorApi.reviewApplication(targetUserId, action)
-    setSuccessMessage(
-      action === 'approve'
-        ? 'Candidatura aprovada com sucesso!'
-        : 'Candidatura rejeitada com sucesso.'
-    )
-    await fetchMentorApplications()
-    await fetchLeaderboard()
+    setSuccessMessage('Perfil e habilidades atualizados com sucesso!')
   }
 
   const handleRateMatch = async (
@@ -238,10 +231,12 @@ function App() {
         wasResolved,
         comment.trim() || null
       )
-      setSuccessMessage('Avaliação registrada com sucesso! Atendimento concluído.')
+      setSuccessMessage('Atendimento concluído com sucesso!')
       setRatingModalMatch(null)
       setSelectedMatch(null)
+      setIsCreatingNewQuestion(true)
       await fetchActiveMatches()
+      await fetchMyQuestions()
       await fetchMentorStatus()
       await fetchLeaderboard()
     } catch (err: unknown) {
@@ -249,9 +244,43 @@ function App() {
     }
   }
 
-  const handleQuestionCreated = async () => {
-    await fetchOpenQuestions()
-    await fetchActiveMatches()
+  const handleCreateQuestion = async (text: string) => {
+    clearFeedback()
+    try {
+      const created = await questionApi.create(text)
+      await fetchOpenQuestions()
+      await fetchMyQuestions()
+      const updatedMatches = await matchApi.getMyActive()
+      setActiveMatches(updatedMatches)
+      setIsCreatingNewQuestion(false)
+
+      if (created.match_id) {
+        const detail = await matchApi.getDetail(created.match_id)
+        setSelectedMatch(detail)
+        setSuccessMessage('Mentor ideal encontrado pela IA! Atendimento iniciado.')
+      } else {
+        const found = updatedMatches.find((m) => m.question_id === created.id)
+        if (found) {
+          setSelectedMatch(found)
+          setSuccessMessage('Mentor ideal encontrado pela IA! Atendimento iniciado.')
+        } else {
+          setSuccessMessage('Dúvida registrada e pareamento por IA acionado no campus!')
+        }
+      }
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Falha ao registrar dúvida.')
+      throw err
+    }
+  }
+
+  const handleNewQuestion = () => {
+    setIsCreatingNewQuestion(true)
+    setSelectedMatch(null)
+  }
+
+  const handleSelectMatch = (m: MatchDetail | null) => {
+    if (m && m.status !== 'active') return
+    setSelectedMatch(m)
   }
 
   if (screen !== 'home') {
@@ -276,59 +305,71 @@ function App() {
 
   return (
     <div className="app-layout">
-      <Header mentorStatus={mentorStatus} onLogout={handleLogout} />
-
-      <NavTabs
-        activeTab={activeTab}
-        onSelectTab={handleSelectTab}
-        activeMatchesCount={activeMatches.length}
+      <Header
+        mentorStatus={mentorStatus}
+        userEmail={decoded?.email}
+        onOpenProfile={() => setIsProfileOpen(true)}
+        onLogout={handleLogout}
       />
 
-      {errorMessage && <div className="alert-message alert-error">{errorMessage}</div>}
-      {successMessage && <div className="alert-message alert-success">{successMessage}</div>}
+      <div className="app-container">
+        <NavTabs
+          activeTab={activeTab}
+          onSelectTab={handleSelectTab}
+          activeMatchesCount={activeMatches.filter((m) => m.status === 'active').length}
+        />
 
-      <main className="app-main">
-        {activeTab === 'duvidas' && (
-          <DuvidasTab
-            isMentor={Boolean(mentorStatus?.is_mentor)}
-            openQuestions={openQuestions}
-            onAcceptQuestion={handleAcceptQuestion}
-            onQuestionCreated={handleQuestionCreated}
-            onError={setErrorMessage}
-            onSuccess={setSuccessMessage}
-          />
-        )}
+        {errorMessage && <div className="alert-message alert-error">{errorMessage}</div>}
+        {successMessage && <div className="alert-message alert-success">{successMessage}</div>}
 
-        {activeTab === 'atendimentos' && (
-          <AtendimentosTab
-            matches={activeMatches}
-            selectedMatch={selectedMatch}
-            currentUserId={currentUserId}
-            messages={messages}
-            onSelectMatch={setSelectedMatch}
-            onSendMessage={handleSendMessage}
-            onRequestRate={setRatingModalMatch}
-          />
-        )}
+        <main className="app-main">
+          {activeTab === 'duvidas' && (
+            <DuvidasTab
+              activeMatch={activeStudentMatch}
+              pendingQuestion={pendingStudentQuestion}
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              onCreateQuestion={handleCreateQuestion}
+              onRequestRate={setRatingModalMatch}
+              onNewQuestion={handleNewQuestion}
+            />
+          )}
 
-        {activeTab === 'mentoria' && (
-          <MentoriaTab
-            mentorStatus={mentorStatus}
-            applications={mentorApplications}
-            onApply={handleApplyMentor}
-            onReview={handleReviewApplication}
-            onError={setErrorMessage}
-            onSuccess={setSuccessMessage}
-          />
-        )}
+          {activeTab === 'atendimentos' && (
+            <AtendimentosTab
+              matches={activeMatches}
+              selectedMatch={selectedMatch}
+              currentUserId={currentUserId}
+              messages={messages}
+              isMentor={Boolean(mentorStatus?.is_mentor)}
+              openQuestions={openQuestions}
+              myQuestions={myQuestions}
+              onAcceptQuestion={handleAcceptQuestion}
+              onSelectMatch={handleSelectMatch}
+              onSendMessage={handleSendMessage}
+              onRequestRate={setRatingModalMatch}
+            />
+          )}
 
-        {activeTab === 'ranking' && (
-          <RankingTab
-            leaderboard={leaderboard}
-            isLoading={isLeaderboardLoading}
-          />
-        )}
-      </main>
+          {activeTab === 'ranking' && (
+            <RankingTab
+              leaderboard={leaderboard}
+              isLoading={isLeaderboardLoading}
+            />
+          )}
+        </main>
+      </div>
+
+      <Footer />
+
+      {isProfileOpen && (
+        <ProfileModal
+          mentorStatus={mentorStatus}
+          onClose={() => setIsProfileOpen(false)}
+          onSaveSkills={handleSaveSkills}
+          onLogout={handleLogout}
+        />
+      )}
 
       {ratingModalMatch && (
         <RatingModal
@@ -342,3 +383,4 @@ function App() {
 }
 
 export default App
+

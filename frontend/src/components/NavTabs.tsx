@@ -18,31 +18,24 @@ export function NavTabs({
         className={'nav-tab ' + (activeTab === 'duvidas' ? 'active' : '')}
         onClick={() => onSelectTab('duvidas')}
       >
-        Dúvidas
+        <span className="nav-tab-label">Dúvidas</span>
       </button>
       <button
         type="button"
         className={'nav-tab ' + (activeTab === 'atendimentos' ? 'active' : '')}
         onClick={() => onSelectTab('atendimentos')}
       >
-        Meus Atendimentos{' '}
+        <span className="nav-tab-label">Atendimentos</span>
         {activeMatchesCount > 0 && (
           <span className="tab-count">{activeMatchesCount}</span>
         )}
       </button>
       <button
         type="button"
-        className={'nav-tab ' + (activeTab === 'mentoria' ? 'active' : '')}
-        onClick={() => onSelectTab('mentoria')}
-      >
-        Mentoria
-      </button>
-      <button
-        type="button"
         className={'nav-tab ' + (activeTab === 'ranking' ? 'active' : '')}
         onClick={() => onSelectTab('ranking')}
       >
-        Ranking
+        <span className="nav-tab-label">Ranking</span>
       </button>
     </nav>
   )

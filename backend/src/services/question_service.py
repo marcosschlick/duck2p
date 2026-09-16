@@ -41,20 +41,29 @@ class QuestionService:
         available_mentors = self.mentor_repo.list_available_approved()
         candidate_mentors = [m for m in available_mentors if m["user_id"] != student_id]
 
+        match_id = None
         if candidate_mentors:
             best_match = self.ai_service.find_best_mentor(
                 embedding_vec, candidate_mentors
             )
             if best_match:
                 best_mentor, score = best_match
-                self.match_service.create_match_with_ai(
+                match_res = self.match_service.create_match_with_ai(
                     question_id=created["id"],
                     mentor_id=best_mentor["user_id"],
                     similarity_score=score,
                 )
                 created["status"] = "matched"
+                match_id = match_res.id
 
-        return QuestionResponse(**created)
+        return QuestionResponse(
+            id=created["id"],
+            student_id=created["student_id"],
+            problem_description=created["problem_description"],
+            status=created["status"],
+            created_at=created.get("created_at"),
+            match_id=match_id,
+        )
 
     def list_my_questions(self, student_id: int) -> list[QuestionResponse]:
         rows = self.question_repo.list_by_student_id(student_id)

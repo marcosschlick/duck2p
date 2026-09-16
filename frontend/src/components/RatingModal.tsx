@@ -14,14 +14,13 @@ interface RatingModalProps {
 export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) {
   const [score, setScore] = useState(5)
   const [wasResolved, setWasResolved] = useState(true)
-  const [comment, setComment] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     try {
-      await onSubmitRate(score, wasResolved, comment)
+      await onSubmitRate(score, wasResolved, '')
     } finally {
       setIsLoading(false)
     }
@@ -31,36 +30,13 @@ export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) 
     <div className="modal-overlay">
       <div className="modal-dialog">
         <header className="modal-header">
-          <h2>Concluir e Avaliar Atendimento</h2>
+          <h2>Concluir Atendimento</h2>
           <p>
-            Sua avaliação é anônima e reconhece o mentor {match.mentor_name}.
+            Confirme a resolução da dúvida com {match.mentor_name}.
           </p>
         </header>
 
         <form className="modal-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Nota do Atendimento (1 a 5 estrelas)</label>
-            <div className="rating-stars">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  className={'star-button ' + (score >= star ? 'selected' : '')}
-                  onClick={() => setScore(star)}
-                >
-                  ★
-                </button>
-              ))}
-              <span className="rating-label">
-                {score === 1 && '1 estrela - Insatisfatório'}
-                {score === 2 && '2 estrelas - Regular'}
-                {score === 3 && '3 estrelas - Bom'}
-                {score === 4 && '4 estrelas - Muito Bom'}
-                {score === 5 && '5 estrelas - Excelente'}
-              </span>
-            </div>
-          </div>
-
           <div className="form-group">
             <label>A sua dúvida foi resolvida?</label>
             <div className="toggle-group">
@@ -82,14 +58,26 @@ export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) 
           </div>
 
           <div className="form-group">
-            <label htmlFor="rating_comment">Comentário Adicional (Opcional)</label>
-            <textarea
-              id="rating_comment"
-              rows={3}
-              placeholder="Deixe um comentário sobre a mentoria..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
+            <label>Como foi a experiência com o mentor?</label>
+            <div className="rating-stars">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className={'star-button ' + (score >= star ? 'selected' : '')}
+                  onClick={() => setScore(star)}
+                >
+                  ★
+                </button>
+              ))}
+              <span className="rating-label">
+                {score === 1 && '1 estrela - Insatisfatório'}
+                {score === 2 && '2 estrelas - Regular'}
+                {score === 3 && '3 estrelas - Bom'}
+                {score === 4 && '4 estrelas - Muito Bom'}
+                {score === 5 && '5 estrelas - Excelente'}
+              </span>
+            </div>
           </div>
 
           <div className="modal-actions">
@@ -102,7 +90,7 @@ export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) 
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={isLoading}>
-              {isLoading ? 'Concluindo...' : 'Finalizar e Avaliar'}
+              {isLoading ? 'Concluindo...' : 'Finalizar Atendimento'}
             </button>
           </div>
         </form>

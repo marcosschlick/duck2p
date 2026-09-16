@@ -89,6 +89,8 @@ class ChatService:
             )
 
         rows = self.message_repo.list_by_match_id(match_id)
+        if user_id == match["mentor_id"]:
+            rows = [r for r in rows if r["sender_id"] is not None]
         return [
             MessageResponse(
                 id=r["id"],

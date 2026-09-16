@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class QuestionCreateRequest(BaseModel):
-    problem_description: str = Field(..., min_length=10)
+    problem_description: str = Field(..., min_length=10, max_length=2000)
 
 
 class QuestionResponse(BaseModel):
@@ -13,6 +13,7 @@ class QuestionResponse(BaseModel):
     problem_description: str
     status: str
     created_at: datetime | None = None
+    match_id: int | None = None
 
 
 class QuestionOpenItem(BaseModel):

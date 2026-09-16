@@ -2,7 +2,7 @@ from typing import Annotated
 
 from dtos.auth_dto import LoginRequest, TokenResponse, UserRegisterRequest, UserResponse
 from fastapi import APIRouter, Depends, status
-from services.auth_service import AuthService
+from services.auth_service import AuthService, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -38,3 +38,16 @@ def login(
     auth_service: AuthServiceDep,
 ) -> TokenResponse:
     return auth_service.login(data)
+
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Obter dados do usuário autenticado",
+)
+def get_me(
+    current_user: Annotated[dict, Depends(get_current_user)],
+) -> UserResponse:
+    return UserResponse(**current_user)
+

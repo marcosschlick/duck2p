@@ -31,7 +31,7 @@ class MentorRepository:
         user_id: int,
         skills: str,
         embedding: str | None = None,
-        status: str = "pending",
+        status: str = "approved",
         approved_by: int | None = None,
     ) -> dict:
         query = """
@@ -99,6 +99,17 @@ class MentorRepository:
         """
         with get_db_connection() as conn, conn.cursor() as cur:
             cur.execute(query, (skills, embedding, user_id))
+
+    @staticmethod
+    def update_embedding(user_id: int, embedding: str) -> None:
+        query = """
+            UPDATE mentor_profiles
+            SET embedding = %s
+            WHERE user_id = %s;
+        """
+        with get_db_connection() as conn, conn.cursor() as cur:
+            cur.execute(query, (embedding, user_id))
+
 
     @staticmethod
     def list_leaderboard() -> list[dict]:

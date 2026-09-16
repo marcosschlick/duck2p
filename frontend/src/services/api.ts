@@ -7,8 +7,10 @@ import type {
   MentorProfile,
   MentorStatus,
   MessageItem,
+  QuestionItem,
   QuestionOpen,
   RegisterForm,
+  UserProfile,
 } from '../types'
 
 const API_BASE_URL = 'http://localhost:8000'
@@ -70,6 +72,13 @@ export const authApi = {
     })
     return parseApiResponse<{ access_token: string }>(response)
   },
+
+  async getMe(): Promise<UserProfile> {
+    const response = await fetch(API_BASE_URL + '/auth/me', {
+      headers: getAuthHeaders(),
+    })
+    return parseApiResponse<UserProfile>(response)
+  },
 }
 
 export const mentorApi = {
@@ -119,13 +128,13 @@ export const mentorApi = {
 }
 
 export const questionApi = {
-  async create(problem_description: string): Promise<{ id: number }> {
+  async create(problem_description: string): Promise<QuestionItem> {
     const response = await fetch(API_BASE_URL + '/questions', {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ problem_description }),
     })
-    return parseApiResponse<{ id: number }>(response)
+    return parseApiResponse<QuestionItem>(response)
   },
 
   async getOpen(): Promise<QuestionOpen[]> {
@@ -133,6 +142,13 @@ export const questionApi = {
       headers: getAuthHeaders(),
     })
     return parseApiResponse<QuestionOpen[]>(response)
+  },
+
+  async getMy(): Promise<QuestionItem[]> {
+    const response = await fetch(API_BASE_URL + '/questions/me', {
+      headers: getAuthHeaders(),
+    })
+    return parseApiResponse<QuestionItem[]>(response)
   },
 
   async accept(questionId: number): Promise<{ id: number }> {

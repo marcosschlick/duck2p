@@ -14,6 +14,7 @@
 .dashboard-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
   border-radius: 8px;
   padding: 1.75rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
@@ -274,3 +275,133 @@
   font-weight: 700;
   white-space: nowrap;
 }
+
+.mentor-skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.skill-pill {
+  font-size: 0.725rem;
+  background-color: var(--color-surface);
+  border: 1px solid rgba(140, 140, 140, 0.4);
+  color: var(--color-text);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge {
+  font-size: 0.775rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.status-badge-conectado {
+  color: #1d4ed8;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.status-badge-andamento {
+  color: #15803d;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.status-badge-encerrado {
+  color: #4b5563;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.status-badge-pending {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: #b45309;
+  background-color: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.pending-card {
+  border-left: 3px solid #f59e0b;
+}
+
+@media (max-width: 680px) {
+  .dashboard-card {
+    padding: 1.15rem 0.95rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.15rem;
+  }
+
+  .tab-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .item-card {
+    padding: 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .item-actions {
+    gap: 0.5rem;
+  }
+
+  .item-actions button {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.8rem;
+  }
+
+  .th-course,
+  .td-course,
+  .th-completed,
+  .td-completed {
+    display: none;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 0.65rem 0.45rem;
+    font-size: 0.8rem;
+  }
+
+  .rank-badge {
+    min-width: 24px;
+    font-size: 0.85rem;
+  }
+
+  .mentor-fullname {
+    font-size: 0.85rem;
+  }
+
+  .skill-pill {
+    font-size: 0.68rem;
+    padding: 0.1rem 0.35rem;
+  }
+
+  .badge-level {
+    font-size: 0.725rem;
+    padding: 0.15rem 0.45rem;
+  }
+}
+
+

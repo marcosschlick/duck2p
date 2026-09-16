@@ -162,13 +162,14 @@ class MatchService:
         if data.was_resolved:
             mentor_profile = self.mentor_repo.find_by_user_id(match["mentor_id"])
             if mentor_profile:
-                current_skills = mentor_profile["skills"]
-                problem_snippet = question["problem_description"].strip()
-                updated_skills = f"{current_skills}, {problem_snippet}"
-                new_embedding = self.ai_service.generate_embedding_json(updated_skills)
-                self.mentor_repo.update_skills_and_embedding(
+                knowledge_context = (
+                    f"{mentor_profile['skills']} {question['problem_description'].strip()}"
+                )
+                new_embedding = self.ai_service.generate_embedding_json(
+                    knowledge_context
+                )
+                self.mentor_repo.update_embedding(
                     user_id=match["mentor_id"],
-                    skills=updated_skills,
                     embedding=new_embedding,
                 )
 
