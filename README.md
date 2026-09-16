@@ -1,5 +1,10 @@
 # duck2p
-Fale com o pato, deixe a IA entender sua dor e destrave o projeto com a ajuda de um colega.
+
+O **duck2p** (*Duck-to-Peer*) é uma plataforma desenvolvida para o CodeDay 2026 voltada a conectar estudantes com dificuldades de programação a mentores voluntários no campus.
+
+O projeto visa superar as limitações do *rubber duck debugging* solitário, permitindo que alunos iniciantes relatem suas dúvidas de programação em linguagem natural e sejam direcionados ao colega mais capacitado para auxiliá-los.
+
+A Inteligência Artificial desempenha o papel de pareamento semântico via similaridade de texto (*embeddings*) entre o problema descrito pelo estudante e as competências cadastradas pelos mentores. Adicionalmente, o modelo sintetiza um *briefing* técnico preliminar sobre a questão para contextualizar o mentor e dar celeridade ao atendimento.
 
 ---
 
