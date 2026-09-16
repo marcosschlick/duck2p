@@ -35,6 +35,7 @@ function App() {
     email: '',
     password: '',
   })
+  const [confirmPassword, setConfirmPassword] = useState<string>('')
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -59,9 +60,28 @@ function App() {
       !registerData.email ||
       !registerData.student_id ||
       !registerData.course ||
-      !registerData.password
+      !registerData.password ||
+      !confirmPassword
     ) {
       setErrorMessage('Por favor, preencha todos os campos.')
+      return
+    }
+
+    if (registerData.password !== confirmPassword) {
+      setErrorMessage('As senhas não coincidem.')
+      return
+    }
+
+    const hasMinLen = registerData.password.length >= 8
+    const hasUpper = /[A-Z]/.test(registerData.password)
+    const hasLower = /[a-z]/.test(registerData.password)
+    const hasNumber = /[0-9]/.test(registerData.password)
+    const hasSymbol = /[^A-Za-z0-9]/.test(registerData.password)
+
+    if (!hasMinLen || !hasUpper || !hasLower || !hasNumber || !hasSymbol) {
+      setErrorMessage(
+        'A senha deve ter no mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo.'
+      )
       return
     }
 
@@ -87,6 +107,7 @@ function App() {
         course: '',
         password: '',
       })
+      setConfirmPassword('')
       setScreen('login')
     } catch (err: unknown) {
       setErrorMessage(
@@ -227,6 +248,18 @@ function App() {
               onChange={(e) =>
                 setRegisterData({ ...registerData, password: e.target.value })
               }
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="confirm-password">Confirmar Senha</label>
+            <input
+              id="confirm-password"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>

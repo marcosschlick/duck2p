@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -19,6 +20,20 @@ class AuthService:
     def __init__(self, user_repo: UserRepository | None = None):
         self.user_repo = user_repo or UserRepository()
 
+    @staticmethod
+    def validate_password_strength(password: str) -> None:
+        if (
+            len(password) < 8
+            or not re.search(r"[A-Z]", password)
+            or not re.search(r"[a-z]", password)
+            or not re.search(r"[0-9]", password)
+            or not re.search(r"[^A-Za-z0-9]", password)
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A senha deve ter no mínimo 8 caracteres, com letra maiúscula, minúscula, número e símbolo.",
+            )
+
     def hash_password(self, password: str) -> str:
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
@@ -38,6 +53,7 @@ class AuthService:
         return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     def register(self, data: UserRegisterRequest) -> UserResponse:
+        self.validate_password_strength(data.password)
         if self.user_repo.find_by_email(data.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
