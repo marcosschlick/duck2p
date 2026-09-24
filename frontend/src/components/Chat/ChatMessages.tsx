@@ -17,6 +17,13 @@ export function ChatMessages({ messages, isThinking }: ChatMessagesProps) {
 
   return (
     <div className="chat-messages-container" role="list" aria-label="Histórico de mensagens">
+      <div className="chat-welcome-pill-banner">
+        <span className="welcome-pill-icon">🦆</span>
+        <span>
+          Depuração por IA ativa. Se não resolver com o pato, um mentor do campus será chamado!
+        </span>
+      </div>
+
       {messages.map((msg) => (
         <ChatMessage key={msg.id} message={msg} />
       ))}

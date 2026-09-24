@@ -52,8 +52,8 @@ function DuckModel({ isThinking }: DuckModelProps) {
 
     groupRef.current.position.y = Math.sin(time * floatSpeed) * floatAmplitude
 
-    const targetRotY = (state.pointer.x * 0.28) - 0.15
-    const targetRotX = (-state.pointer.y * 0.12) + (isThinking ? 0.07 : 0)
+    const targetRotY = -0.15 + Math.sin(time * 0.8) * 0.04
+    const targetRotX = isThinking ? 0.05 : 0
     const targetRotZ = Math.sin(time * 1.1) * 0.02 + (isThinking ? 0.05 : 0)
 
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
@@ -80,6 +80,10 @@ function DuckModel({ isThinking }: DuckModelProps) {
       </Center>
       <Html position={[0.45, 1.0, 0]} center distanceFactor={6}>
         <div className="duck-annotation">
+          <span
+            className={'status-dot-pulse ' + (isThinking ? 'pending' : '')}
+            style={{ width: 6, height: 6 }}
+          />
           <span>{isThinking ? 'Pensando na resposta...' : 'Quack quack, quack!'}</span>
         </div>
       </Html>

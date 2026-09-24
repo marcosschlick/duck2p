@@ -42,10 +42,28 @@ export async function parseApiResponse<T>(response: Response): Promise<T> {
   const data = isJson ? await response.json() : null
 
   if (!response.ok) {
-    const errorDetail =
-      data && typeof data === 'object' && 'detail' in data
-        ? (data as { detail: string }).detail
-        : null
+    let errorDetail: string | null = null
+    if (data && typeof data === 'object' && 'detail' in data) {
+      const detail = (data as { detail: unknown }).detail
+      if (typeof detail === 'string') {
+        errorDetail = detail
+      } else if (Array.isArray(detail)) {
+        errorDetail = detail
+          .map((item) => {
+            if (typeof item === 'object' && item && 'msg' in item) {
+              const msg = String(item.msg)
+              if (msg.includes('at least 10 characters')) {
+                return 'A descrição da dúvida deve ter pelo menos 10 caracteres.'
+              }
+              return msg
+            }
+            return typeof item === 'string' ? item : JSON.stringify(item)
+          })
+          .join(', ')
+      } else if (detail && typeof detail === 'object') {
+        errorDetail = JSON.stringify(detail)
+      }
+    }
     throw new Error(
       errorDetail || ('Erro ' + response.status + ': ' + (response.statusText || 'Falha no servidor'))
     )

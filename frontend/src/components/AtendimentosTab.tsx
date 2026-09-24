@@ -33,6 +33,97 @@ function formatTime(dateStr?: string | null): string {
   }
 }
 
+function AtendimentoMessageBubble({
+  msg,
+  isDuckBot,
+  formatTimeFn,
+}: {
+  msg: MessageItem
+  isDuckBot: boolean
+  formatTimeFn: (t?: string | null) => string
+}) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(msg.content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      return
+    }
+  }
+
+  const roleLabel = isDuckBot ? 'Duck Bot' : msg.is_mine ? 'Você' : msg.sender_name
+
+  return (
+    <div
+      className={
+        'atendimento-msg-row ' +
+        (isDuckBot ? 'assistant' : msg.is_mine ? 'student' : 'peer')
+      }
+      role="listitem"
+    >
+      {!msg.is_mine && (
+        <div className="atendimento-msg-avatar" aria-hidden="true">
+          {isDuckBot ? (
+            <img src={logoIcon} alt="Duck2P" className="atendimento-avatar-img" />
+          ) : (
+            <span className="atendimento-avatar-letter">
+              {msg.sender_name.charAt(0).toUpperCase()}
+            </span>
+          )}
+        </div>
+      )}
+
+      <div className="atendimento-bubble-wrapper">
+        <div className="atendimento-msg-meta">
+          <strong className="atendimento-sender-name">{roleLabel}</strong>
+          {isDuckBot && <span className="atendimento-meta-badge">IA</span>}
+          {msg.created_at && (
+            <span className="atendimento-meta-time">{formatTimeFn(msg.created_at)}</span>
+          )}
+        </div>
+
+        <div
+          className={
+            'message-bubble ' +
+            (isDuckBot ? 'message-duckbot' : msg.is_mine ? 'message-mine' : 'message-other')
+          }
+        >
+          <div className="message-text">{msg.content}</div>
+          <div className="message-bubble-actions">
+            <button
+              type="button"
+              className="chat-copy-btn"
+              onClick={handleCopy}
+              aria-label="Copiar texto"
+              title="Copiar mensagem"
+            >
+              {copied ? (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>Copiado</span>
+                </>
+              ) : (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  <span>Copiar</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function AtendimentosTab({
   matches,
   selectedMatch,
@@ -49,6 +140,7 @@ export function AtendimentosTab({
   const [subtab, setSubtab] = useState<'duvidas' | 'mentorias'>('duvidas')
   const [messageInput, setMessageInput] = useState('')
   const chatEndRef = useRef<HTMLDivElement | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   useEffect(() => {
     if (selectedMatch && chatEndRef.current) {
@@ -56,12 +148,28 @@ export function AtendimentosTab({
     }
   }, [messages, selectedMatch])
 
-  const handleSend = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSend = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     if (!messageInput.trim()) return
     const text = messageInput.trim()
     setMessageInput('')
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
     await onSendMessage(text)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessageInput(e.target.value)
+    e.target.style.height = 'auto'
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`
   }
 
   if (selectedMatch && selectedMatch.status === 'active') {
@@ -80,101 +188,149 @@ export function AtendimentosTab({
                 <div className="chat-header-info">
                   <button
                     type="button"
-                    className="btn-link"
+                    className="chat-back-btn"
                     onClick={() => onSelectMatch(null)}
+                    aria-label="Voltar para a lista de atendimentos"
                   >
-                    ← Voltar para a lista
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <line x1="19" y1="12" x2="5" y2="12" />
+                      <polyline points="12 19 5 12 12 5" />
+                    </svg>
+                    <span>Voltar</span>
                   </button>
-                  <div className="chat-title-group">
-                    <h2>
+
+                  <div className="chat-peer-avatar-wrapper">
+                    <div className="chat-peer-avatar">
                       {isStudent
-                        ? 'Mentor: ' + selectedMatch.mentor_name
-                        : 'Aluno: ' + selectedMatch.student_name}
-                    </h2>
-                    {selectedMatch.first_response_at ? (
-                      <span className="status-badge status-badge-andamento">● Em andamento</span>
-                    ) : (
-                      <span className="status-badge status-badge-conectado">● Mentor conectado</span>
-                    )}
-                    {selectedMatch.similarity_score !== undefined &&
-                      selectedMatch.similarity_score !== null && (
-                        <span className="affinity-badge">
-                          {formatAffinity(selectedMatch.similarity_score)}
+                        ? selectedMatch.mentor_name.charAt(0).toUpperCase()
+                        : selectedMatch.student_name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="avatar-online-dot" />
+                  </div>
+
+                  <div className="chat-header-text">
+                    <div className="chat-header-title-row">
+                      <h2 className="chat-header-title">
+                        {isStudent
+                          ? selectedMatch.mentor_name
+                          : selectedMatch.student_name}
+                      </h2>
+                      <span className="chat-peer-role-badge">
+                        {isStudent ? 'Mentor IFSUL' : 'Aluno IFSUL'}
+                      </span>
+                      {selectedMatch.first_response_at ? (
+                        <span className="status-badge status-badge-andamento">
+                          <span className="status-dot-pulse" /> Em andamento
+                        </span>
+                      ) : (
+                        <span className="status-badge status-badge-conectado">
+                          <span className="status-dot-pulse connected" /> Conectado
                         </span>
                       )}
+                      {selectedMatch.similarity_score !== undefined &&
+                        selectedMatch.similarity_score !== null && (
+                          <span className="affinity-badge">
+                            {formatAffinity(selectedMatch.similarity_score)}
+                          </span>
+                        )}
+                    </div>
+                    <span className="chat-header-subtitle">
+                      Sessão #{selectedMatch.id} • Dúvida acadêmica vinculada
+                    </span>
                   </div>
-                  <p className="chat-contact">Atendimento #{selectedMatch.id}</p>
                 </div>
 
                 {isStudent && selectedMatch.status === 'active' && (
                   <button
                     type="button"
-                    className="btn-primary btn-complete"
+                    className="btn-complete-atendimento"
                     onClick={() => onRequestRate(selectedMatch)}
                   >
-                    Finalizar Atendimento
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>Finalizar Atendimento</span>
                   </button>
                 )}
               </header>
 
-              <div className="chat-question-banner">
-                <strong>Dúvida do Aluno:</strong> {selectedMatch.problem_description}
+              <div className="chat-question-card">
+                <div className="chat-question-header">
+                  <span className="question-tag">Dúvida Registrada</span>
+                  <span className="question-id">#{selectedMatch.question_id}</span>
+                </div>
+                <p className="chat-question-text">{selectedMatch.problem_description}</p>
               </div>
 
-              <div className="chat-messages">
+              <div className="chat-messages" role="list" aria-label="Mensagens do atendimento">
                 {visibleMessages.length === 0 ? (
-                  <p className="empty-state">Nenhuma mensagem ainda. Inicie o diálogo!</p>
+                  <p className="empty-state">Nenhuma mensagem ainda. Inicie o diálogo de suporte!</p>
                 ) : (
                   visibleMessages.map((msg) => {
                     const isDuckBot = msg.sender_name === 'Duck Bot' || msg.sender_id === null
                     return (
-                      <div
+                      <AtendimentoMessageBubble
                         key={msg.id}
-                        className={
-                          'message-bubble ' +
-                          (isDuckBot
-                            ? 'message-duckbot'
-                            : msg.is_mine
-                            ? 'message-mine'
-                            : 'message-other')
-                        }
-                      >
-                        <span className="message-sender">
-                          {isDuckBot && (
-                            <img
-                              src={logoIcon}
-                              alt="Duck2P"
-                              style={{ width: 16, height: 16, objectFit: 'contain', verticalAlign: 'middle', marginRight: 4 }}
-                            />
-                          )}
-                          {msg.sender_name}
-                        </span>
-                        <p className="message-text">{msg.content}</p>
-                        {msg.created_at && (
-                          <span className="message-time">
-                            {formatTime(msg.created_at)}
-                          </span>
-                        )}
-                      </div>
+                        msg={msg}
+                        isDuckBot={isDuckBot}
+                        formatTimeFn={formatTime}
+                      />
                     )
                   })
                 )}
-                <div ref={chatEndRef} />
+                <div ref={chatEndRef} aria-hidden="true" />
               </div>
 
-              <form className="chat-form" onSubmit={handleSend}>
-                <input
-                  type="text"
-                  maxLength={2000}
-                  placeholder="Digite sua mensagem de suporte..."
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  required
-                />
-                <button type="submit" className="btn-primary">
-                  Enviar
-                </button>
-              </form>
+              <div className="chat-composer-area">
+                <form className="chat-composer-card" onSubmit={handleSend}>
+                  <textarea
+                    ref={textareaRef}
+                    rows={2}
+                    maxLength={2000}
+                    className="chat-composer-textarea"
+                    placeholder="Digite sua mensagem de suporte (Shift+Enter para nova linha)..."
+                    value={messageInput}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
+                    aria-label="Mensagem de suporte"
+                  />
+
+                  <div className="chat-composer-toolbar">
+                    <div className="composer-toolbar-left">
+                      <span className="composer-tip-badge">
+                        ✦ Chat em tempo real IFSUL
+                      </span>
+                    </div>
+
+                    <div className="composer-toolbar-right">
+                      <span className="composer-char-count">
+                        {messageInput.length}/2000
+                      </span>
+                      <kbd className="composer-kbd">↵ Enter</kbd>
+                      <button
+                        type="submit"
+                        className="composer-send-btn"
+                        disabled={!messageInput.trim()}
+                        aria-label="Enviar mensagem"
+                        title="Enviar mensagem"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M5 12h14" />
+                          <path d="m12 5 7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </section>
           </div>
 
@@ -186,11 +342,11 @@ export function AtendimentosTab({
             {isMentorUser && selectedMatch.ai_briefing ? (
               <div className="chat-briefing-card">
                 <div className="briefing-header">
-                  <img
-                    src={logoIcon}
-                    alt="Duck2P"
-                    style={{ width: 18, height: 18, objectFit: 'contain', verticalAlign: 'middle', marginRight: 6 }}
-                  />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
                   <strong>Briefing Pedagógico da IA (Exclusivo do Mentor)</strong>
                 </div>
                 <div className="briefing-content">{selectedMatch.ai_briefing}</div>
@@ -270,14 +426,21 @@ export function AtendimentosTab({
                 {studentMatches.map((m) => (
                   <article key={m.id} className="item-card">
                     <div className="item-meta">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                        <span className="mentor-cell-avatar">
+                          {m.mentor_name.charAt(0).toUpperCase()}
+                        </span>
                         <span className="item-author">Mentor: {m.mentor_name}</span>
                         {m.status === 'completed' ? (
-                          <span className="status-badge status-badge-encerrado">● Encerrado</span>
+                          <span className="status-badge status-badge-encerrado">Encerrado</span>
                         ) : m.first_response_at ? (
-                          <span className="status-badge status-badge-andamento">● Em andamento</span>
+                          <span className="status-badge status-badge-andamento">
+                            <span className="status-dot-pulse" /> Em andamento
+                          </span>
                         ) : (
-                          <span className="status-badge status-badge-conectado">● Mentor conectado</span>
+                          <span className="status-badge status-badge-conectado">
+                            <span className="status-dot-pulse connected" /> Mentor conectado
+                          </span>
                         )}
                       </div>
                       {m.similarity_score !== undefined && m.similarity_score !== null && (
@@ -317,16 +480,23 @@ export function AtendimentosTab({
                 {pendingQuestions.map((q) => (
                   <article key={'pending-' + q.id} className="item-card pending-card">
                     <div className="item-meta">
-                      <span className="item-author">Dúvida #{q.id}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                        <span className="mentor-cell-avatar" style={{ background: '#fef3c7', color: '#b45309' }}>
+                          #
+                        </span>
+                        <span className="item-author">Dúvida #{q.id}</span>
+                      </div>
                       {q.status === 'resolved' ? (
-                        <span className="status-badge status-badge-encerrado">● Encerrado</span>
+                        <span className="status-badge status-badge-encerrado">Encerrado</span>
                       ) : (
-                        <span className="status-badge status-badge-pending">● Aguardando mentor</span>
+                        <span className="status-badge status-badge-pending">
+                          <span className="status-dot-pulse pending" /> Aguardando mentor
+                        </span>
                       )}
                     </div>
                     <p className="item-description">{q.problem_description}</p>
                     <div className="item-meta" style={{ marginTop: '0.25rem' }}>
-                      <span className="item-contact">Pareamento por IA ativo no campus</span>
+                      <span className="item-contact">Pareamento semântico por IA ativo no campus</span>
                     </div>
                   </article>
                 ))}
@@ -342,14 +512,21 @@ export function AtendimentosTab({
             mentorMatches.map((m) => (
               <article key={m.id} className="item-card">
                 <div className="item-meta">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                    <span className="mentor-cell-avatar">
+                      {m.student_name.charAt(0).toUpperCase()}
+                    </span>
                     <span className="item-author">Aluno: {m.student_name}</span>
                     {m.status === 'completed' ? (
-                      <span className="status-badge status-badge-encerrado">● Encerrado</span>
+                      <span className="status-badge status-badge-encerrado">Encerrado</span>
                     ) : m.first_response_at ? (
-                      <span className="status-badge status-badge-andamento">● Em andamento</span>
+                      <span className="status-badge status-badge-andamento">
+                        <span className="status-dot-pulse" /> Em andamento
+                      </span>
                     ) : (
-                      <span className="status-badge status-badge-conectado">● Mentor conectado</span>
+                      <span className="status-badge status-badge-conectado">
+                        <span className="status-dot-pulse connected" /> Mentor conectado
+                      </span>
                     )}
                   </div>
                   {m.similarity_score !== undefined && m.similarity_score !== null && (

@@ -62,6 +62,8 @@ export function DuvidasTab({
     setIsThinking(true)
     try {
       await onCreateQuestion(text)
+    } catch {
+      return
     } finally {
       setIsThinking(false)
     }
@@ -96,11 +98,15 @@ export function DuvidasTab({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
                       <h2>Mentor: {activeMatch.mentor_name}</h2>
                       {activeMatch.status === 'completed' ? (
-                        <span className="status-badge status-badge-encerrado">● Encerrado</span>
+                        <span className="status-badge status-badge-encerrado">Encerrado</span>
                       ) : activeMatch.first_response_at ? (
-                        <span className="status-badge status-badge-andamento">● Em andamento</span>
+                        <span className="status-badge status-badge-andamento">
+                          <span className="status-dot-pulse" /> Em andamento
+                        </span>
                       ) : (
-                        <span className="status-badge status-badge-conectado">● Mentor conectado</span>
+                        <span className="status-badge status-badge-conectado">
+                          <span className="status-dot-pulse connected" /> Mentor conectado
+                        </span>
                       )}
                       {activeMatch.similarity_score !== undefined &&
                         activeMatch.similarity_score !== null && (
@@ -231,7 +237,9 @@ export function DuvidasTab({
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                       <h2>Dúvida #{pendingQuestion.id}</h2>
-                      <span className="status-badge-pending">● Aguardando mentor</span>
+                      <span className="status-badge-pending">
+                        <span className="status-dot-pulse pending" /> Aguardando mentor
+                      </span>
                     </div>
                     <p className="chat-contact">Pareamento por IA ativo no campus</p>
                   </div>

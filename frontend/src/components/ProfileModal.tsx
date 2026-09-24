@@ -9,6 +9,17 @@ interface ProfileModalProps {
   onLogout: () => void
 }
 
+const SUGGESTED_SKILLS = [
+  'Python',
+  'C / C++',
+  'JavaScript',
+  'TypeScript',
+  'React',
+  'Banco de Dados',
+  'Algoritmos',
+  'Git',
+]
+
 export function ProfileModal({
   mentorStatus,
   onClose,
@@ -16,16 +27,34 @@ export function ProfileModal({
   onLogout,
 }: ProfileModalProps) {
   const [user, setUser] = useState<UserProfile | null>(null)
-  const [skills, setSkills] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [skills, setSkills] = useState(mentorStatus?.profile?.skills || '')
+  const [prevSkills, setPrevSkills] = useState(mentorStatus?.profile?.skills)
+  const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
 
+  if (mentorStatus?.profile?.skills !== prevSkills) {
+    setPrevSkills(mentorStatus?.profile?.skills)
+    if (mentorStatus?.profile?.skills) {
+      setSkills(mentorStatus.profile.skills)
+    }
+  }
+
   const isMentor = Boolean(mentorStatus?.is_mentor)
+
+  const handleAddSkill = (tag: string) => {
+    const current = skills.trim()
+    if (!current) {
+      setSkills(tag)
+      return
+    }
+    const existing = current.split(',').map((s) => s.trim().toLowerCase())
+    if (existing.includes(tag.toLowerCase())) return
+    setSkills(`${current}, ${tag}`)
+  }
 
   useEffect(() => {
     let isMounted = true
-    setIsLoading(true)
     authApi
       .getMe()
       .then((data) => {
@@ -39,12 +68,6 @@ export function ProfileModal({
       isMounted = false
     }
   }, [])
-
-  useEffect(() => {
-    if (mentorStatus?.profile?.skills) {
-      setSkills(mentorStatus.profile.skills)
-    }
-  }, [mentorStatus?.profile?.skills])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -126,6 +149,18 @@ export function ProfileModal({
                     placeholder="Ex.: Python, C, React, SQL, Estruturas de Dados"
                     required
                   />
+                  <div className="quick-skill-chips">
+                    {SUGGESTED_SKILLS.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        className="skill-chip-btn"
+                        onClick={() => handleAddSkill(tag)}
+                      >
+                        + {tag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {feedback && (

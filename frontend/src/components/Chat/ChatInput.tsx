@@ -29,7 +29,7 @@ export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value)
     e.target.style.height = 'auto'
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`
   }
 
   useEffect(() => {
@@ -38,43 +38,64 @@ export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
     }
   }, [disabled])
 
-  const canSubmit = text.trim().length > 0 && !disabled
+  const canSubmit = text.trim().length >= 10 && !disabled
 
   return (
-    <div className="chat-input-area">
-      <form className="chat-form" onSubmit={handleSubmit}>
+    <div className="chat-composer-area">
+      <form className="chat-composer-card" onSubmit={handleSubmit}>
         <textarea
           ref={inputRef}
-          rows={1}
+          rows={2}
           maxLength={2000}
-          className="chat-text-input"
-          placeholder="Digite sua dúvida aqui..."
+          className="chat-composer-textarea"
+          placeholder="Explique o que seu código deveria fazer, qual erro ocorreu ou onde você travou..."
           value={text}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           aria-label="Mensagem para o assistente"
         />
 
-        <button
-          type="submit"
-          className="chat-send-btn"
-          disabled={!canSubmit}
-          aria-label="Enviar mensagem"
-          title="Enviar (Enter)"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        </button>
+        <div className="chat-composer-toolbar">
+          <div className="composer-toolbar-left">
+            <span className="composer-tip-badge">
+              ✦ Rubber Duck Debugging
+            </span>
+          </div>
+
+          <div className="composer-toolbar-right">
+            <span className="composer-char-count">
+              {text.length}/2000
+            </span>
+            <kbd className="composer-kbd">↵ Enter</kbd>
+            <button
+              type="submit"
+              className="composer-send-btn"
+              disabled={!canSubmit}
+              aria-label="Enviar mensagem"
+              title={text.trim().length < 10 ? 'Digite ao menos 10 caracteres' : 'Enviar mensagem'}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </form>
+
+      {text.length > 0 && text.length < 10 && (
+        <div className="composer-hint-warning">
+          <span>Faltam {10 - text.length} caracteres para habilitar o pareamento com mentores.</span>
+        </div>
+      )}
     </div>
   )
 }

@@ -246,8 +246,12 @@ function App() {
 
   const handleCreateQuestion = async (text: string) => {
     clearFeedback()
+    if (text.trim().length < 10) {
+      setErrorMessage('Por favor, descreva sua dúvida com pelo menos 10 caracteres para que a IA encontre o melhor mentor.')
+      return
+    }
     try {
-      const created = await questionApi.create(text)
+      const created = await questionApi.create(text.trim())
       await fetchOpenQuestions()
       await fetchMyQuestions()
       const updatedMatches = await matchApi.getMyActive()
@@ -269,7 +273,6 @@ function App() {
       }
     } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : 'Falha ao registrar dúvida.')
-      throw err
     }
   }
 

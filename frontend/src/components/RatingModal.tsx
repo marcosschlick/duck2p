@@ -13,8 +13,11 @@ interface RatingModalProps {
 
 export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) {
   const [score, setScore] = useState(5)
+  const [hoverScore, setHoverScore] = useState<number | null>(null)
   const [wasResolved, setWasResolved] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+
+  const displayScore = hoverScore ?? score
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -27,8 +30,8 @@ export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) 
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-dialog">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <header className="modal-header">
           <h2>Concluir Atendimento</h2>
           <p>
@@ -45,14 +48,14 @@ export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) 
                 className={'toggle-btn ' + (wasResolved ? 'active' : '')}
                 onClick={() => setWasResolved(true)}
               >
-                Sim
+                <span>✓</span> Sim, resolvida
               </button>
               <button
                 type="button"
                 className={'toggle-btn ' + (!wasResolved ? 'active' : '')}
                 onClick={() => setWasResolved(false)}
               >
-                Não
+                <span>✕</span> Não resolvida
               </button>
             </div>
           </div>
@@ -64,18 +67,21 @@ export function RatingModal({ match, onClose, onSubmitRate }: RatingModalProps) 
                 <button
                   key={star}
                   type="button"
-                  className={'star-button ' + (score >= star ? 'selected' : '')}
+                  className={'star-button ' + (displayScore >= star ? 'selected' : '')}
                   onClick={() => setScore(star)}
+                  onMouseEnter={() => setHoverScore(star)}
+                  onMouseLeave={() => setHoverScore(null)}
+                  aria-label={`${star} estrelas`}
                 >
                   ★
                 </button>
               ))}
               <span className="rating-label">
-                {score === 1 && '1 estrela - Insatisfatório'}
-                {score === 2 && '2 estrelas - Regular'}
-                {score === 3 && '3 estrelas - Bom'}
-                {score === 4 && '4 estrelas - Muito Bom'}
-                {score === 5 && '5 estrelas - Excelente'}
+                {displayScore === 1 && '1 estrela - Insatisfatório'}
+                {displayScore === 2 && '2 estrelas - Regular'}
+                {displayScore === 3 && '3 estrelas - Bom'}
+                {displayScore === 4 && '4 estrelas - Muito Bom'}
+                {displayScore === 5 && '5 estrelas - Excelente'}
               </span>
             </div>
           </div>

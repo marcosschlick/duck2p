@@ -20,32 +20,46 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.75rem;
-  margin: 0.25rem 0 1.5rem 0;
+  margin: 0.5rem 0 1.5rem 0;
   width: 100%;
-  flex-wrap: wrap;
+}
+
+.nav-tabs-pill-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  padding: 5px;
+  box-shadow: var(--shadow-sm);
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .nav-tab {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  padding: 0.65rem 1.5rem;
-  font-size: 0.95rem;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.55rem 1.35rem;
+  font-size: 0.885rem;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-text-muted);
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.15s ease;
+  border-radius: var(--radius-full);
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  gap: 0.5rem;
+  white-space: nowrap;
 }
 
 .nav-tab:hover {
-  border-color: var(--color-primary);
   color: var(--color-primary);
-  background-color: rgba(115, 3, 13, 0.04);
+  background-color: var(--color-primary-subtle);
+}
+
+.nav-tab:active {
+  transform: scale(0.97);
 }
 
 .nav-tab.active {
@@ -53,27 +67,51 @@
   border-color: var(--color-primary);
   color: #ffffff;
   font-weight: 700;
-  box-shadow: 0 4px 14px rgba(115, 3, 13, 0.22);
+  box-shadow: var(--shadow-primary);
+}
+
+.nav-tab.active:hover {
+  background-color: var(--color-primary-hover);
+  color: #ffffff;
+}
+
+.nav-tab-icon {
+  flex-shrink: 0;
+  transition: transform 160ms var(--ease-out);
+}
+
+.nav-tab:hover .nav-tab-icon {
+  transform: scale(1.08);
+}
+
+.nav-tab.active .nav-tab-icon {
+  stroke: #ffffff;
 }
 
 .nav-tab-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
 }
 
-.tab-count {
-  background-color: var(--color-primary);
-  color: #ffffff;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  padding: 0.15rem 0.55rem;
-  font-weight: 700;
-}
-
-.nav-tab.active .tab-count {
+.tab-count-badge {
   background-color: #ffffff;
   color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: 0.725rem;
+  padding: 0.1rem 0.5rem;
+  font-weight: 800;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  line-height: 1;
+}
+
+.nav-tab:not(.active) .tab-count-badge {
+  background-color: var(--color-primary);
+  color: #ffffff;
 }
 
 .app-main {
@@ -85,16 +123,17 @@
 
 .duvidas-layout {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.95fr);
   gap: 1.5rem;
   width: 100%;
   height: calc(100vh - 190px);
-  min-height: 640px;
+  min-height: 580px;
 }
 
 .duvidas-chat-column {
   height: 100%;
   min-height: 0;
+  min-width: 0;
 }
 
 .duvidas-mascot-column {
@@ -103,16 +142,18 @@
   gap: 1rem;
   height: 100%;
   min-height: 0;
+  min-width: 0;
 }
 
 .duvidas-scene-wrap {
   flex: 1;
   background-color: var(--color-surface);
-  border: 1px solid rgba(140, 140, 140, 0.3);
-  border-radius: 12px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
   min-height: 380px;
+  box-shadow: var(--shadow-sm);
 }
 
 .subtabs-bar {
@@ -193,21 +234,35 @@
   border-color: #ffffff;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1180px) {
   .duvidas-layout {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-  .duvidas-chat-column {
-    height: calc(100dvh - 180px);
-    min-height: 460px;
-  }
-  .duvidas-mascot-column {
-    display: none !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: 1.15rem;
   }
 }
 
 @media (max-width: 860px) {
+  .duvidas-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 1.15rem;
+  }
+
+  .duvidas-mascot-column {
+    height: 260px;
+    min-height: 260px;
+    order: -1;
+  }
+
+  .duvidas-scene-wrap {
+    height: 260px;
+    min-height: 260px;
+  }
+
+  .duvidas-chat-column {
+    height: 560px;
+    min-height: 440px;
+  }
   .app-container {
     padding: 0.85rem 0.85rem 1.5rem 0.85rem;
     gap: 1rem;

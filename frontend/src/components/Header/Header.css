@@ -1,7 +1,7 @@
 .app-header {
   height: 64px;
-  background: linear-gradient(135deg, #79031b 0%, #4a020d 100%);
-  border-bottom: 2px solid #360109;
+  background: linear-gradient(135deg, #73030D 0%, #4e0209 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -9,104 +9,135 @@
   width: 100%;
   box-sizing: border-box;
   flex-shrink: 0;
-  box-shadow: 0 2px 12px rgba(74, 2, 13, 0.18);
+  box-shadow: 0 4px 20px rgba(78, 2, 9, 0.25);
+  position: relative;
+  z-index: 50;
 }
 
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
 .header-logo-group {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.65rem;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.header-logo-group:active {
+  transform: scale(0.97);
 }
 
 .header-duck-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  transition: transform 200ms var(--ease-spring);
+}
+
+.header-logo-group:hover .header-duck-icon {
+  transform: rotate(-6deg) scale(1.08);
 }
 
 .header-brand-name {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.5px;
+  background: linear-gradient(180deg, #ffffff 0%, #fde8e8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .header-divider {
   width: 1px;
-  height: 18px;
-  background-color: rgba(255, 255, 255, 0.3);
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .header-tagline {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.82);
   font-weight: 400;
+  letter-spacing: 0.1px;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.85rem;
+}
+
+.header-badge {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  color: #fff9e6;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .header-profile-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  gap: 0.55rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   color: #ffffff;
-  padding: 0.4rem 0.85rem;
-  border-radius: 6px;
+  padding: 0.35rem 0.85rem 0.35rem 0.45rem;
+  border-radius: var(--radius-full);
   font-size: 0.825rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out);
 }
 
 .header-profile-btn:hover {
-  border-color: #ffffff;
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.header-profile-btn:active {
+  transform: scale(0.97);
 }
 
 .header-profile-avatar {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background-color: #ffffff;
-  color: #79031b;
+  background: linear-gradient(135deg, #ffffff 0%, #ffe4e6 100%);
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: 0.725rem;
   font-weight: 800;
-}
-
-.header-badge {
-  font-size: 0.775rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  font-weight: 700;
-  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .app-header .btn-outline {
-  border-color: rgba(255, 255, 255, 0.35);
-  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
   background: transparent;
+  border-radius: var(--radius-full);
+  padding: 0.4rem 1rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out);
 }
 
 .app-header .btn-outline:hover {
@@ -115,9 +146,13 @@
   color: #ffffff;
 }
 
+.app-header .btn-outline:active {
+  transform: scale(0.97);
+}
+
 @media (max-width: 860px) {
   .app-header {
-    padding: 0 0.85rem;
+    padding: 0 1rem;
     height: 56px;
   }
 
@@ -133,27 +168,26 @@
 
 @media (max-width: 520px) {
   .header-duck-icon {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
   }
 
   .header-brand-name {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .header-badge {
-    font-size: 0.68rem;
-    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
   }
 
   .header-profile-btn {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.75rem;
-    gap: 0.35rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.35rem;
+    font-size: 0.775rem;
   }
 
   .app-header .btn-outline {
-    padding: 0.3rem 0.55rem;
+    padding: 0.3rem 0.75rem;
     font-size: 0.75rem;
   }
 }
