@@ -18,10 +18,12 @@ export function ChatPanel({
   onResetChat,
 }: ChatPanelProps) {
   return (
-    <section className="chat-panel" aria-label="Painel de depuração com Duck2P">
-      <ChatHeader onResetChat={onResetChat} />
-      <ChatMessages messages={messages} isThinking={isThinking} />
-      <ChatInput onSendMessage={onSendMessage} disabled={isThinking} />
-    </section>
+    <div className="chat-panel-shell">
+      <section className="chat-panel" aria-label="Painel de depuração com Duck2P">
+        <ChatHeader onResetChat={onResetChat} />
+        <ChatMessages messages={messages} isThinking={isThinking} />
+        <ChatInput onSendMessage={onSendMessage} disabled={isThinking} />
+      </section>
+    </div>
   )
 }

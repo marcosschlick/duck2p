@@ -18,9 +18,14 @@ export function ChatMessages({ messages, isThinking }: ChatMessagesProps) {
   return (
     <div className="chat-messages-container" role="list" aria-label="Histórico de mensagens">
       <div className="chat-welcome-pill-banner">
-        <span className="welcome-pill-icon">🦆</span>
+        <span className="welcome-pill-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+          </svg>
+        </span>
         <span>
-          Depuração por IA ativa. Se não resolver com o pato, um mentor do campus será chamado!
+          Depuração por IA ativa. Se não resolver com o pato, um mentor do campus será chamado automaticamente.
         </span>
       </div>
 

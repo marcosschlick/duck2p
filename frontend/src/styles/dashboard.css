@@ -8,16 +8,24 @@
 .tab-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   width: 100%;
+}
+
+.dashboard-card-shell {
+  background: var(--bezel-shell-bg);
+  border: 1px solid var(--bezel-shell-border);
+  border-radius: var(--radius-xl);
+  padding: 5px;
+  box-shadow: var(--shadow-md);
 }
 
 .dashboard-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 1.75rem 2rem;
-  box-shadow: var(--shadow-sm);
+  border-radius: calc(var(--radius-xl) - 5px);
+  padding: 1.85rem 2.1rem;
+  box-shadow: var(--bezel-inner-highlight), var(--shadow-sm);
   transition: box-shadow 200ms var(--ease-out);
 }
 
@@ -35,14 +43,15 @@
   font-size: 1.45rem;
   font-weight: 800;
   color: var(--color-primary);
-  letter-spacing: -0.4px;
+  letter-spacing: -0.03em;
   margin-bottom: 0.35rem;
 }
 
 .card-header p {
-  font-size: 0.925rem;
+  font-size: 0.915rem;
   color: var(--color-text-muted);
-  line-height: 1.45;
+  line-height: 1.5;
+  max-width: 65ch;
 }
 
 .card-form {
@@ -80,8 +89,8 @@
 
 .empty-state {
   color: var(--color-text-muted);
-  font-size: 0.925rem;
-  padding: 2.5rem 1rem;
+  font-size: 0.915rem;
+  padding: 2.5rem 1.25rem;
   text-align: center;
   background-color: var(--color-bg);
   border: 1px dashed var(--color-border-subtle);
@@ -97,13 +106,15 @@
   flex-direction: column;
   gap: 0.85rem;
   box-shadow: var(--shadow-sm);
-  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), border-color 160ms var(--ease-out);
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), border-color 180ms var(--ease-out);
 }
 
-.item-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-border-hover);
+@media (hover: hover) and (pointer: fine) {
+  .item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border-hover);
+  }
 }
 
 .item-meta {
@@ -117,23 +128,24 @@
 .item-author {
   font-weight: 700;
   color: var(--color-text);
-  font-size: 0.975rem;
+  font-size: 0.96rem;
+  letter-spacing: -0.015em;
 }
 
 .item-course,
 .item-contact {
   color: var(--color-text-muted);
-  font-size: 0.825rem;
+  font-size: 0.815rem;
 }
 
 .item-description {
   color: var(--color-text);
-  font-size: 0.925rem;
+  font-size: 0.915rem;
   white-space: pre-wrap;
   word-break: break-word;
-  line-height: 1.5;
+  line-height: 1.55;
   background-color: var(--color-bg);
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 1.05rem;
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--color-primary);
 }
@@ -146,7 +158,7 @@
 .item-actions {
   display: flex;
   gap: 0.75rem;
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
   flex-wrap: wrap;
 }
 
@@ -169,18 +181,20 @@
 }
 
 .metric-value {
-  font-size: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: 1.55rem;
   font-weight: 800;
   color: var(--color-primary);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
 }
 
 .metric-label {
-  font-size: 0.775rem;
+  font-size: 0.73rem;
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.05em;
 }
 
 .profile-details {
@@ -198,30 +212,35 @@
 .subtabs-bar {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: 0.35rem;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--bezel-shell-bg);
+  border: 1px solid var(--bezel-shell-border);
   border-radius: var(--radius-full);
   padding: 4px;
   box-shadow: var(--shadow-sm);
-  margin-bottom: 0.5rem;
 }
 
 .subtab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   background-color: transparent;
   border: none;
   color: var(--color-text-muted);
-  padding: 0.5rem 1.15rem;
+  padding: 0.48rem 1.1rem;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.84rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out), color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
 }
 
-.subtab-btn:hover {
-  color: var(--color-primary);
-  background-color: var(--color-primary-subtle);
+@media (hover: hover) and (pointer: fine) {
+  .subtab-btn:hover:not(.active) {
+    color: var(--color-primary);
+    background-color: rgba(255, 255, 255, 0.7);
+  }
 }
 
 .subtab-btn:active {
@@ -231,14 +250,33 @@
 .subtab-btn.active {
   background-color: var(--color-primary);
   color: #ffffff;
+  box-shadow: var(--shadow-primary);
+}
+
+.subtab-count-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-weight: 700;
-  box-shadow: var(--shadow-sm);
+  padding: 0.08rem 0.45rem;
+  border-radius: var(--radius-full);
+  background: rgba(13, 13, 13, 0.08);
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.subtab-btn.active .subtab-count-pill {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
 }
 
 .leaderboard-header {
   text-align: center;
   max-width: 680px;
   margin: 0 auto 2.25rem auto;
+}
+
+.leaderboard-header p {
+  margin: 0 auto;
 }
 
 .leaderboard-header-badge {
@@ -248,11 +286,14 @@
   background: var(--color-primary-subtle);
   color: var(--color-primary);
   border: 1px solid var(--color-primary-glow);
-  padding: 0.25rem 0.8rem;
+  padding: 0.28rem 0.85rem;
   border-radius: var(--radius-full);
-  font-size: 0.775rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 700;
-  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.75rem;
 }
 
 .leaderboard-header-badge svg {
@@ -278,20 +319,22 @@
   align-items: center;
   text-align: center;
   position: relative;
-  box-shadow: var(--shadow-sm);
-  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+  box-shadow: var(--bezel-inner-highlight), var(--shadow-sm);
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
 }
 
-.podium-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+@media (hover: hover) and (pointer: fine) {
+  .podium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
 .podium-rank-1 {
   background: linear-gradient(180deg, #fffdf5 0%, #ffffff 100%);
   border: 2px solid #fbbf24;
   padding-top: 2.25rem;
-  box-shadow: 0 8px 30px rgba(251, 191, 36, 0.18);
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.18);
   order: 2;
 }
 
@@ -315,22 +358,26 @@
   padding: 4px 6px;
   box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
   border: 1px solid #fde047;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .podium-medal-crown {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   margin-bottom: 0.85rem;
 }
 
 .podium-medal-pill {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-weight: 800;
   padding: 0.2rem 0.65rem;
   border-radius: var(--radius-full);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.04em;
 }
 
 .gold-medal {
@@ -351,13 +398,13 @@
   border: 1px solid #fdba74;
 }
 
-.podium-medal-emoji {
-  font-size: 1.15rem;
+.podium-medal-svg {
+  flex-shrink: 0;
 }
 
 .podium-avatar-ring {
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -387,10 +434,10 @@
 }
 
 .podium-name {
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 800;
   color: var(--color-text);
-  letter-spacing: -0.3px;
+  letter-spacing: -0.025em;
   margin-bottom: 0.2rem;
 }
 
@@ -398,7 +445,7 @@
   font-size: 0.8rem;
   color: var(--color-text-muted);
   margin-bottom: 0.85rem;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .podium-stats-row {
@@ -406,10 +453,12 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.65rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .podium-level-tag {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-full);
@@ -425,12 +474,14 @@
 }
 
 .podium-points-tag {
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   color: var(--color-text);
   background-color: var(--color-bg);
   border: 1px solid var(--color-border-subtle);
   padding: 0.2rem 0.65rem;
   border-radius: var(--radius-full);
+  font-variant-numeric: tabular-nums;
 }
 
 .gold-points {
@@ -440,10 +491,11 @@
 }
 
 .podium-atendimentos-text {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--color-text-muted);
   margin-bottom: 0.85rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .podium-skills-wrap {
@@ -454,13 +506,13 @@
 }
 
 .podium-skill-chip {
-  font-size: 0.725rem;
+  font-size: 0.72rem;
   background-color: var(--color-bg);
   border: 1px solid var(--color-border-subtle);
   color: var(--color-text);
   padding: 0.15rem 0.5rem;
   border-radius: var(--radius-sm);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .gold-chip {
@@ -485,15 +537,18 @@
 }
 
 .table-section-title {
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.02rem;
+  font-weight: 800;
   color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 
 .table-section-count {
-  font-size: 0.825rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
   color: var(--color-text-muted);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .leaderboard-table-wrapper {
@@ -514,11 +569,11 @@
   background-color: var(--color-bg);
   color: var(--color-text-muted);
   font-weight: 700;
-  font-size: 0.785rem;
+  font-size: 0.74rem;
   padding: 0.85rem 1.15rem;
   border-bottom: 1px solid var(--color-border-subtle);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
@@ -533,31 +588,36 @@
   transition: background-color 140ms var(--ease-out);
 }
 
-.leaderboard-row:hover {
-  background-color: var(--color-primary-subtle);
+@media (hover: hover) and (pointer: fine) {
+  .leaderboard-row:hover {
+    background-color: var(--color-primary-subtle);
+  }
 }
 
 .row-highlight-1 {
-  background-color: rgba(254, 240, 138, 0.12);
+  background-color: rgba(254, 240, 138, 0.14);
 }
 
 .row-highlight-2 {
-  background-color: rgba(241, 245, 249, 0.4);
+  background-color: rgba(241, 245, 249, 0.45);
 }
 
 .row-highlight-3 {
-  background-color: rgba(255, 237, 213, 0.18);
+  background-color: rgba(255, 237, 213, 0.2);
 }
 
 .rank-pill {
+  font-family: var(--font-mono);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.3rem;
   font-weight: 800;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   padding: 0.2rem 0.6rem;
   border-radius: var(--radius-full);
-  min-width: 44px;
+  min-width: 48px;
+  font-variant-numeric: tabular-nums;
 }
 
 .rank-1 {
@@ -598,35 +658,42 @@
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 .mentor-fullname {
   font-weight: 700;
   color: var(--color-text);
-  font-size: 0.95rem;
+  font-size: 0.94rem;
 }
 
 .badge-level {
+  font-family: var(--font-mono);
   background-color: var(--color-bg);
   border: 1px solid var(--color-border-subtle);
   color: var(--color-primary);
   font-weight: 700;
-  font-size: 0.775rem;
+  font-size: 0.75rem;
   padding: 0.2rem 0.65rem;
   border-radius: var(--radius-full);
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .points-badge {
-  font-size: 0.925rem;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
   color: var(--color-primary);
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .completed-badge {
-  font-size: 0.885rem;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  font-weight: 700;
   color: var(--color-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .mentor-skills-tags {
@@ -636,20 +703,20 @@
 }
 
 .skill-pill {
-  font-size: 0.725rem;
+  font-size: 0.72rem;
   background-color: var(--color-bg);
   border: 1px solid var(--color-border-subtle);
   color: var(--color-text-muted);
-  padding: 0.15rem 0.45rem;
+  padding: 0.14rem 0.45rem;
   border-radius: var(--radius-sm);
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .status-badge {
-  font-size: 0.775rem;
-  font-weight: 600;
-  padding: 0.25rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.22rem 0.68rem;
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
@@ -676,12 +743,12 @@
 }
 
 .status-badge-pending {
-  font-size: 0.775rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   color: #b45309;
   background-color: #fef3c7;
   border: 1px solid #fde68a;
-  padding: 0.25rem 0.7rem;
+  padding: 0.22rem 0.68rem;
   border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
@@ -770,13 +837,20 @@
 }
 
 .empty-state-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: var(--color-primary-subtle);
+  border: 1px solid var(--color-primary-glow);
+  margin-bottom: 0.85rem;
 }
 
 .empty-state-card h3 {
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-text);
   margin-bottom: 0.35rem;
 }
